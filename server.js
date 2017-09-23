@@ -206,7 +206,7 @@ client.on('message', message => {
 		
 		var argument = allarguments[sarg];
 		if(argument) {
-			action.handle(message);
+			argument.handle(message);
 		} else {
 			message.reply('Unknown argument \"' + saction + '\"');
 		}	

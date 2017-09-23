@@ -1,9 +1,9 @@
 module.exports = {
   apps : [{
-    name        : "mindmap",
-    script      : "./server.js",
-    watch       : true,
-	ignore_watch : ["src"],
+    name        : "tzm-bot",
+    script      : "server.js",
+    watch       : ['server.js'],
+	ignore_watch : ["src", "*.old", ".log", "ecosystem.config.js"],
     env: {
       "NODE_ENV": "development",
     },
