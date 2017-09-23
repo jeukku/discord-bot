@@ -208,7 +208,7 @@ client.on('message', message => {
 		if(argument) {
 			argument.handle(message);
 		} else {
-			message.reply('Unknown argument \"' + saction + '\"');
+			message.reply('Unknown argument \"' + argument + '\"');
 		}	
 	} else if (message.content === 'ping') {
 		// message.reply('pong DOOP');
