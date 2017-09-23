@@ -209,9 +209,9 @@ client.on('message', message => {
 			message.reply('Unknown argument \"' + saction + '\"');
 		}	
 	} else if (message.content === 'ping') {
-		message.reply('pong DOOP');
+		// message.reply('pong DOOP');
 	} else if(message.author.username != "tzm-bot") {
-		message.reply("unknown message " + message.content.replace(/\@/g, "FOO") + " user: " + message.author.username);
+		// message.reply("unknown message " + message.content.replace(/\@/g, "FOO") + " user: " + message.author.username);
 	}
 });
 
