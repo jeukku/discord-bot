@@ -63,9 +63,9 @@ actions.delete_argument = {
 		console.log("deleting argument:\"" + argumentname + "\"");
 
 		dbConnect(function(err, db) {
-			deleteArgument(db, function() {
+			deleteArgument(db, function(docs) {
 				message.reply("removed argument:" + argumentname + " docs:" + JSON.stringify(docs));
-				db.close();	
+				db.close();
 			})
 		});
 	}
@@ -126,7 +126,7 @@ function deleteArgument(name, callback) {
 			var carguments = db.collection('arguments');
 			var query = { argument: name };
 			carguments.remove(query, function(err, docs) {
-				callback();
+				callback(docs);
 			});
 		});
 }
