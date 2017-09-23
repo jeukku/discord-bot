@@ -62,12 +62,9 @@ actions.delete_argument = {
 		var argumentname = message.content.substr(message.content.indexOf(" ")+1);
 		console.log("deleting argument:\"" + argumentname + "\"");
 
-		dbConnect(function(err, db) {
-			deleteArgument(db, function(docs) {
-				message.reply("removed argument:" + argumentname + " docs:" + JSON.stringify(docs));
-				db.close();
-			})
-		});
+		deleteArgument(argumentname, function(docs) {
+			message.reply("removed argument:" + argumentname + " docs:" + JSON.stringify(docs));
+		})
 	}
 };
 
