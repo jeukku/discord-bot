@@ -59,6 +59,7 @@ actions.store_argument = {
 			
 			var carguments = db.collection('arguments');
 			var query = { argument: argumentname };
+			var update = { argument: argumentname, text: text }; 
 			carguments.update(query, update, { upsert: true }, function(err, docs) {
 				message.reply("stored argument:" + argumentname + " text:" + text);
 				db.close();
