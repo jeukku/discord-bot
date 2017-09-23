@@ -201,7 +201,7 @@ client.on('message', message => {
 	} else if(message.content.startsWith("?")) {
 		var sarg  = message.content.substr(1);
 		if(sarg.indexOf(" ") > 0) {
-			sarg = saction.substr(0, sarg(" ") - 1).trim();
+			sarg = sarg.substr(0, sarg(" ") - 1).trim();
 		}
 		
 		var argument = allarguments[sarg];
