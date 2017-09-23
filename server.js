@@ -204,7 +204,7 @@ function dbConnect(callback) {
 
 client.on('ready', () => {
 	console.log('I am ready!');
-	podbot = require('./podbot/index.js').create(ADMIN_CHANNEL_NAME, client);
+	//podbot = require('./podbot/index.js').create(ADMIN_CHANNEL_NAME, client);
 });
 
 client.on('message', message => {
