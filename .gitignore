@@ -61,3 +61,4 @@ typings/
 
 .vagrant
 *.stackdump
+podbot

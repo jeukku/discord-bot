@@ -6,9 +6,14 @@ var sleep = require('sleep');
 
 var MongoClient = require('mongodb').MongoClient, assert = require('assert');
 var dburl = 'mongodb://localhost:27017/tzmfi_discord';
+const fs = require('fs');
+
+const ADMIN_CHANNEL_NAME = "bot-admin";
 
 var actions = {};
 var allarguments = {};
+
+var podbot;
 
 actions.help = { channel: "all", 
 	handle: function(message) {
@@ -31,6 +36,25 @@ actions.uptime = { channel: "admin",
 	}
 };
 
+actions.record = {
+	channel: "admin",
+	handle: function(message) {
+		console.log("Should record " + message.content);
+		
+		if (message.member.voiceChannel) {
+			message.member.voiceChannel.join().then(connection => { 
+				message.reply('I have successfully connected to the channel!');
+				var rec = connection.createReceiver();
+				
+			})
+			.catch(console.log);
+		} else {
+			message.reply('You need to join a voice channel first!');
+		}	
+		
+	}
+};
+
 actions.delete_argument = {
 	channel: "admin",
 	handle: function(message) {
@@ -38,9 +62,11 @@ actions.delete_argument = {
 		var argumentname = message.content.substr(message.content.indexOf(" ")+1);
 		console.log("deleting argument:\"" + argumentname + "\"");
 
-		deleteArgument(db, function() {
-			message.reply("removed argument:" + argumentname + " docs:" + JSON.stringify(docs));
-			db.close();	
+		dbConnect(function(err, db) {
+			deleteArgument(db, function() {
+				message.reply("removed argument:" + argumentname + " docs:" + JSON.stringify(docs));
+				db.close();	
+			})
 		});
 	}
 };
@@ -162,7 +188,7 @@ function responseArgument(message, name) {
 
 function checkRights(action, message) {
 	if(action.channel == "admin") {
-		if(message.channel.name == "bot-admin") {
+		if(message.channel.name == ADMIN_CHANNEL_NAME) {
 			return true;
 		} else {
 			return false;
@@ -177,7 +203,8 @@ function dbConnect(callback) {
 }
 
 client.on('ready', () => {
-  console.log('I am ready!');
+	console.log('I am ready!');
+	podbot = require('./podbot/index.js').create(ADMIN_CHANNEL_NAME, client);
 });
 
 client.on('message', message => {
