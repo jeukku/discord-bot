@@ -63,6 +63,8 @@ actions.store_argument = {
 			carguments.update(query, update, { upsert: true }, function(err, docs) {
 				message.reply("stored argument:" + argumentname + " text:" + text);
 				db.close();
+				
+				fetchArguments();
 			});
 		});
 	}
