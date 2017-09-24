@@ -30,7 +30,7 @@ actions.help = { channel: "all",
 	}
 };
 
-actions.uptime = { channel: "admin",
+actions.uptime = { channel: "all",
 	handle: function(message) {
 		message.reply("Uptime " + process.uptime());
 	}
@@ -227,6 +227,8 @@ client.on('message', message => {
 		if(sarg.indexOf(" ") > 0) {
 			sarg = sarg.substr(0, sarg.indexOf(" ")).trim();
 		}
+		
+		sarg = sarg.replace(/_/g, "");
 		
 		var argument = allarguments[sarg];
 		if(argument) {
