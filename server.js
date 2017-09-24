@@ -206,7 +206,10 @@ client.on('ready', () => {
 
 client.on('message', message => {
 	// console.log("got message " + message.content + " on channel " + message.channel);
-	if(message.content.trim().length < 4) {
+	if (!message.content.split(" ")[0].match(/[a-z]/i)) {
+		// not alphabet letters found
+		// ignore
+	} else if(message.content.trim().length < 4) {
 		// ignore
 	} else if(message.content.startsWith("!")) {
 		var saction = message.content.substr(1);
