@@ -206,7 +206,9 @@ client.on('ready', () => {
 
 client.on('message', message => {
 	// console.log("got message " + message.content + " on channel " + message.channel);
-	if(message.content.startsWith("!")) {
+	if(message.content.trim().length < 4) {
+		// ignore
+	} else if(message.content.startsWith("!")) {
 		var saction = message.content.substr(1);
 		if(saction.indexOf(" ") > 0) {
 			saction = saction.substr(0, message.content.indexOf(" ") - 1).trim();
