@@ -206,16 +206,15 @@ client.on('ready', () => {
 
 client.on('message', message => {
 	// console.log("got message " + message.content + " on channel " + message.channel);
-	if (!message.content.split(" ")[0].match(/[a-z]/i)) {
+	var first = message.content.split(" ")[0].trim();
+	
+	if (!first.match(/[a-z]/i)) {
 		// not alphabet letters found
 		// ignore
 	} else if(message.content.trim().length < 4) {
 		// ignore
 	} else if(message.content.startsWith("!")) {
-		var saction = message.content.substr(1);
-		if(saction.indexOf(" ") > 0) {
-			saction = saction.substr(0, message.content.indexOf(" ") - 1).trim();
-		}
+		var saction = first.substr(1).toLowerCase();
 		
 		var action = actions[saction];
 		if(action) {
@@ -228,10 +227,7 @@ client.on('message', message => {
 			message.reply('unknown ACTION \"' + saction + '\"');
 		}
 	} else if(message.content.startsWith("?")) {
-		var sarg  = message.content.substr(1);
-		if(sarg.indexOf(" ") > 0) {
-			sarg = sarg.substr(0, sarg.indexOf(" ")).trim();
-		}
+		var sarg  = first.substr(1).toLowerCase();
 		
 		sarg = sarg.replace(/_/g, "");
 		
