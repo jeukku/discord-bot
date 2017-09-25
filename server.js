@@ -232,6 +232,10 @@ client.on('message', message => {
 		sarg = sarg.replace(/_/g, "");
 		
 		var argument = allarguments[sarg];
+		if(!argument) {
+			argument = allarguments[sarg.toUpperCase()];
+		}
+		
 		if(argument) {
 			argument.handle(message);
 		} else {
