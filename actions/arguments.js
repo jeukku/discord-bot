@@ -34,7 +34,7 @@ function Arguments(app) {
 			var argumentname = message.content.substr(message.content.indexOf(" ")+1);
 			console.log("deleting argument:\"" + argumentname + "\"");
 
-			this.deleteArgument(argumentname, function(docs) {
+			self.deleteArgument(argumentname, function(docs) {
 				message.reply("removed argument:" + argumentname + " docs:" + JSON.stringify(docs));
 			})
 		}
