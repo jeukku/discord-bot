@@ -39,7 +39,7 @@ var app = new App();
 app.actions.help = { channel: "all", 
 	handle: function(message) {
 		var list = "";
-		for(var key in actions) {
+		for(var key in app.actions) {
 			if(list.length > 0) {
 				list += ", ";
 			}
