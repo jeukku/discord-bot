@@ -239,7 +239,7 @@ client.on('message', message => {
 		if(argument) {
 			argument.handle(message);
 		} else {
-			message.reply('Unknown argument \"' + sarg + '\"');
+			message.reply('I\'m not sure what \"' + sarg + '\" means, you can suggest an explanation for it, though so I can learn.');
 		}	
 	} else if (message.content === 'ping') {
 		// message.reply('pong DOOP');
