@@ -10,19 +10,39 @@ const fs = require('fs');
 
 const ADMIN_CHANNEL_NAME = "bot-admin";
 
-var actions = {};
-var allarguments = {};
-
 var podbot;
 
-actions.help = { channel: "all", 
+function App() {
+	this.actions = {};
+	
+	this.arguments = require('./actions/arguments.js').init(this);
+	
+	this.checkRights = function(action, message) {
+		if(action.channel == "admin") {
+			if(message.channel.name == ADMIN_CHANNEL_NAME) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+	
+	this.dbConnect = function(callback) {
+		MongoClient.connect(dburl, callback);
+	}
+}
+
+var app = new App();
+
+app.actions.help = { channel: "all", 
 	handle: function(message) {
 		var list = "";
 		for(var key in actions) {
 			if(list.length > 0) {
 				list += ", ";
 			}
-			
 			list += key;
 		}
 		
@@ -30,13 +50,13 @@ actions.help = { channel: "all",
 	}
 };
 
-actions.uptime = { channel: "all",
+app.actions.uptime = { channel: "all",
 	handle: function(message) {
 		message.reply("Uptime " + process.uptime());
 	}
 };
 
-actions.record = {
+app.actions.record = {
 	channel: "admin",
 	handle: function(message) {
 		console.log("Should record " + message.content);
@@ -50,154 +70,9 @@ actions.record = {
 			.catch(console.log);
 		} else {
 			message.reply('You need to join a voice channel first!');
-		}	
-		
-	}
-};
-
-actions.delete_argument = {
-	channel: "admin",
-	handle: function(message) {
-		console.log("delete_argument content \"" + message.content + "\"");
-		var argumentname = message.content.substr(message.content.indexOf(" ")+1);
-		console.log("deleting argument:\"" + argumentname + "\"");
-
-		deleteArgument(argumentname, function(docs) {
-			message.reply("removed argument:" + argumentname + " docs:" + JSON.stringify(docs));
-		})
-	}
-};
-
-actions.store_argument = {
-	channel: "admin",
-	handle: function(message) {
-		dbConnect(function(err, db) {
-			console.log("store_argument content \"" + message.content + "\"");
-			var rest = message.content.substr(message.content.indexOf(" ")).trim();
-			
-			var argumentname = rest.substr(0, rest.indexOf(" ")).trim();
-			var text = rest.substr(rest.indexOf(":") + 1).trim();
-			
-			console.log("argument:\"" + argumentname + "\" text:" + text);
-			
-			var carguments = db.collection('arguments');
-			var query = { argument: argumentname };
-			var update = { argument: argumentname, text: text }; 
-			carguments.update(query, update, { upsert: true }, function(err, docs) {
-				message.reply("stored argument:" + argumentname + " text:" + text);
-				db.close();
-				
-				fetchArguments();
-			});
-		});
-	}
-};
-
-actions.list_arguments = {
-	channel: "all",
-	handle: function(message) {
-		dbConnect(function(err, db) {
-			console.log("listing arguments");
-			var carguments = db.collection('arguments');
-			carguments.find({}).toArray(function(err, docs) {
-				console.log("arguments " + JSON.stringify(docs));
-				
-				var list = "";
-				docs.forEach(function(item) {
-					if(list.length > 0) {
-						list += ", ";
-					}
-					
-					list += item.argument;
-				});
-				
-				message.reply("Arguments " + list);
-				db.close();
-			});
-		});
-	}
-};
-
-function deleteArgument(name, callback) {
-		dbConnect(function(err, db) {
-			var carguments = db.collection('arguments');
-			var query = { argument: name };
-			carguments.remove(query, function(err, docs) {
-				callback(docs);
-			});
-		});
-}
-
-function fetchArguments() {
-	dbConnect(function(err, db) {
-		var carguments = db.collection('arguments');
-		carguments.find({}).toArray(function(err, docs) {
-			console.log("arguments " + JSON.stringify(docs));
-
-			var shoulddelete = "";
-			
-			docs.forEach(function(item) {
-				var name = item.argument;
-				if(name.indexOf(" ")>0 || name.indexOf(":")>0) {
-					shoulddelete = name;
-					console.log("not adding " + name);
-				} else {
-					console.log("Adding action name:" + item.argument + " text:" + item.text);
-					allarguments[name] = {
-						channel: "all",
-						handle: function(message) {
-							responseArgument(message, name);
-						}
-					};
-				}
-			});
-
-			db.close();
-			
-			if(shoulddelete.length>0) {
-				deleteArgument(shoulddelete, function() {
-					console.log("deleted " + shoulddelete);
-				});
-			}
-			
-		});
-	});
-}
-
-function responseArgument(message, name) {
-	dbConnect(function(err, db) {
-		var carguments = db.collection('arguments');
-		carguments.find({ argument: name }).toArray(function(err, docs) {
-			docs.forEach(function(item) {
-				var content = "";
-				var index = message.content.indexOf(" "); 
-				if(index > 0) {
-					content = message.content.substring(index).trim() + " : ";
-				}
-				
-				message.reply("" + content + "" + item.text);
-			});
-			
-			db.close();
-		});
-	});
-}
-
-function checkRights(action, message) {
-	if(action.channel == "admin") {
-		if(message.channel.name == ADMIN_CHANNEL_NAME) {
-			return true;
-		} else {
-			return false;
 		}
-	} else {
-		return true;
 	}
-}
-
-function dbConnect(callback) {
-	MongoClient.connect(dburl, callback);
-}
+};
 
 client.on('ready', () => {
 	console.log('I am ready!');
@@ -208,17 +83,20 @@ client.on('message', message => {
 	// console.log("got message " + message.content + " on channel " + message.channel);
 	var first = message.content.split(" ")[0].trim();
 	
+	first = first.substr(1).toLowerCase();
+	first = first.replace(/[^A-Za-z0-9]/g, "");
+	
 	if (!first.match(/[a-z]/i)) {
 		// not alphabet letters found
 		// ignore
 	} else if(message.content.trim().length < 4) {
 		// ignore
 	} else if(message.content.startsWith("!")) {
-		var saction = first.substr(1).toLowerCase();
-		
-		var action = actions[saction];
+		var saction = first;
+		console.log("action " + saction);
+		var action = app.actions[saction];
 		if(action) {
-			if(!checkRights(action, message)) {
+			if(!app.checkRights(action, message)) {
 				console.log("ignoring admin command " + saction + " from " + message.author.username);
 			} else {
 				action.handle(message);
@@ -227,20 +105,7 @@ client.on('message', message => {
 			message.reply('unknown ACTION \"' + saction + '\"');
 		}
 	} else if(message.content.startsWith("?")) {
-		var sarg  = first.substr(1).toLowerCase();
-		
-		sarg = sarg.replace(/_/g, "");
-		
-		var argument = allarguments[sarg];
-		if(!argument) {
-			argument = allarguments[sarg.toUpperCase()];
-		}
-		
-		if(argument) {
-			argument.handle(message);
-		} else {
-			message.reply('I\'m not sure what \"' + sarg + '\" means, can you tell me? If you suggest an explanation and mention @jeukku I can learn.');
-		}	
+		app.arguments.handle(first, message);
 	} else if (message.content === 'ping') {
 		// message.reply('pong DOOP');
 	} else if(message.author.username != "tzm-bot") {
@@ -250,6 +115,7 @@ client.on('message', message => {
 
 sleep.sleep(1);
 
-fetchArguments();
+app.arguments.fetchArguments();
+
 client.login(process.env.DISCORD_BOT_LOGIN);
 

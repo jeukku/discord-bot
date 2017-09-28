@@ -3,7 +3,7 @@ module.exports = {
     name        : "tzm-bot",
     script      : "server.js",
     watch       : true,
-	ignore_watch : ["token", "podcasts", "src", "*.old", ".log", "ecosystem.config.js"],
+	ignore_watch : ["token", "podcasts", "src", "*.old", ".log", "logs", "ecosystem.config.js"],
     env: {
       "NODE_ENV": "development",
     },
