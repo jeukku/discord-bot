@@ -43,53 +43,159 @@ function Arguments(app) {
 			message.reply('I\'m not sure what \"' + first + '\" means, can you tell me? If you suggest an explanation and mention @jeukku I can learn.');
 		}	
 	};
-	
+		
 	this.actions.deleteargument = {
 		channel: "admin",
-		handle: function(message) {
-			console.log("deleteargument content \"" + message.content + "\"");
-			var argumentname = message.content.substr(message.content.indexOf(" ")+1);
-			console.log("deleting argument:\"" + argumentname + "\"");
+		view: "delete_argument",
+		needparams: true,
+		handle: function(message, rest) {
+			var argumentid = rest;
+			console.log("deleting argument:\"" + argumentid + "\"");
 
-			self.deleteArgument(argumentname, function(docs) {
-				message.reply("removed argument:" + argumentname + " docs:" + JSON.stringify(docs));
-			})
+			self.deleteArgument(argumentid, function(docs) {
+				message.reply("removed argument:" + argumentid + " docs:" + JSON.stringify(docs));
+			});
 		}
-	};
+	}
 
-	this.actions.storeargument = {
-		channel: "admin",
-		handle: function(message) {
+	this.actions.suggestargument = {
+		channel: "all",
+		view: "suggest_argument",
+		needparams: true,
+		handle: function(message, rest) {
+			var argumentname = rest.substr(0, rest.indexOf(" ")).trim();
+			var text = rest.substr(rest.indexOf(":") + 1).trim();
+			var username = message.author.username;
 			app.dbConnect(function(err, db) {
-				console.log("storeargument content \"" + message.content + "\"");
-				var rest = message.content.substr(message.content.indexOf(" ")).trim();
-				
-				var argumentname = rest.substr(0, rest.indexOf(" ")).trim();
-				var text = rest.substr(rest.indexOf(":") + 1).trim();
-				
-				console.log("argument:\"" + argumentname + "\" text:" + text);
+				console.log("connected");
 				
 				var carguments = db.collection('arguments');
-				var query = { argument: argumentname };
-				var update = { argument: argumentname, text: text }; 
+				var query = { argument: argumentname, author: username, state: "suggestion" };
+				var update = { argument: argumentname, text: text, author: username, state: "suggestion", argumentid: self.generateId() }; 
+				
 				carguments.update(query, update, { upsert: true }, function(err, docs) {
-					message.reply("stored argument:" + argumentname + " text:" + text);
+					console.log("reply");
+					message.reply("stored suggestion:" + argumentname + " by " + username + " text:" + text);
 					db.close();
-					
-					self.fetchArguments();
+				});
+			});
+		}
+	}
+
+	this.actions.publishargument = {
+		channel: "admin",
+		view: "publish_argument",
+		needsargument: true,
+		handle: function(message, rest) {
+			app.dbConnect(function(err, db) {
+				console.log("storeargument content \"" + message.content + "\"");
+				var argumentid = rest;
+				
+				console.log("publish argument:" + argumentid);
+				
+				var carguments = db.collection('arguments');
+				var query = { argumentid: argumentid };
+				var update = { state: "published" };
+				
+				carguments.findOne(query, function(err, item) {
+					item.state = "published";
+					carguments.update( { _id: item._id }, item, function(err, docs) {
+						message.reply("published " + argumentid + " " + JSON.stringify(docs));
+						db.close();
+						self.fetchArguments();
+					});
 				});
 			});
 		}
 	};
 
-
-	this.actions.listarguments = {
-		channel: "all",
-		handle: function(message) {
+	this.actions.unpublishargument = {
+		channel: "admin",
+		view: "unpublish_argument",
+		needsargument: true,
+		handle: function(message, rest) {
 			app.dbConnect(function(err, db) {
-				console.log("listing arguments");
+				console.log("unpublishargument content \"" + message.content + "\"");
+				var argumentid = rest;
+				
+				console.log("unpublish argument:" + argumentid);
+				
 				var carguments = db.collection('arguments');
-				carguments.find({}).toArray(function(err, docs) {
+				var query = { argumentid: argumentid };
+
+				carguments.findOne(query, function(err, item) {
+					item.state = "suggestion";
+					carguments.update( { _id: item._id }, item, function(err, docs) {
+						message.reply("unpublished " + argumentid + " " + JSON.stringify(docs));
+						db.close();
+						self.fetchArguments();
+					});
+				});
+			});
+		}
+	};
+
+	this.actions.fixarguments = {
+		channel: "admin",
+		view: "fix_arguments",
+		handle: function(message, rest) {
+			app.dbConnect(function(err, db) {
+				console.log("listing argumentsuggestions");
+				var carguments = db.collection('arguments');
+				carguments.find({ }).toArray(function(err, docs) {
+					if(err) {
+						console.error("ERROR " + err);
+					}
+					
+					console.log("arguments " + JSON.stringify(docs));
+					
+					var fixed = "";
+					
+					var bulk = carguments.initializeOrderedBulkOp();
+					
+					docs.forEach(function(item) {
+						message.reply(JSON.stringify(item));
+						
+						if(!item.argumentid) {
+							var newid = self.generateId();
+							bulk.find( { _id: item._id } ).updateOne( { $set: { argumentid: newid }});
+							fixed += "adding argumentid[" + newid + "] to " + item._id + "\n";
+						}
+
+						if(!item.state) {
+							bulk.find( { _id: item._id } ).updateOne( { $set: { state: "published" }});
+							fixed += "setting published  to " +  item.argument + "[" + item._id + "][" + item.argumentid + "]\n";
+						}
+
+
+						if(!item.argument) {
+							bulk.find( { _id: item._id } ).removeOne();
+							fixed += "deleting " +  item.argument + "[" + item._id + "]";
+						}
+
+					 });
+
+					bulk.execute(function(err, result) {
+						message.reply("fixed " + fixed);
+						db.close();
+					});
+				});
+			});
+		}		
+	};
+	
+	this.actions.listargumentsuggestions = {
+		channel: "admin",
+		view: "list_argument_suggestions",
+		handle: function(message, rest) {
+			app.dbConnect(function(err, db) {
+				console.log("listing argumentsuggestions");
+				var carguments = db.collection('arguments');
+				carguments.find({ state: { $not: /published/ }}).toArray(function(err, docs) {
+					if(err) {
+						console.error("ERROR " + err);
+					}
+					
 					console.log("arguments " + JSON.stringify(docs));
 					
 					var list = "";
@@ -99,8 +205,54 @@ function Arguments(app) {
 						}
 						
 						list += item.argument;
+						var aid = item.argumentid;
+						list += " [" + item.argumentid + "] by " + item.author;
 					});
 					
+					message.reply("Argumentsuggestions " + list);
+					db.close();
+				});
+			});
+		}
+	};
+
+	this.actions.viewargument = {
+		channel: "admin",
+		view: "view_argument",
+		needsargument: true,
+		handle: function(message, rest) {
+			app.dbConnect(function(err, db) {
+				console.log("viewing argument " + rest);
+				var carguments = db.collection('arguments');
+				carguments.find({ argument: rest }).toArray(function(err, docs) {
+					console.log("arguments " + JSON.stringify(docs));
+					
+					message.reply(JSON.stringify(docs));
+					db.close();
+				});
+			});
+		}
+	};
+
+	this.actions.listarguments = {
+		channel: "all",
+		view: "list_arguments",
+		handle: function(message, rest) {
+			app.dbConnect(function(err, db) {
+				console.log("listing arguments");
+				var carguments = db.collection('arguments');
+				carguments.find({ state: "published" }).toArray(function(err, docs) {
+					console.log("arguments " + JSON.stringify(docs));
+					
+					var list = "";
+					docs.forEach(function(item) {
+						if(list.length > 0) {
+							list += ", ";
+						}
+
+						list += item.argument;
+					});
+
 					message.reply("Arguments " + list);
 					db.close();
 				});
@@ -108,10 +260,10 @@ function Arguments(app) {
 		}
 	};
 
-	this.deleteArgument = function(name, callback) {
+	this.deleteArgument = function(argumentid, callback) {
 			app.dbConnect(function(err, db) {
 				var carguments = db.collection('arguments');
-				var query = { argument: name };
+				var query = { argumentid: argumentid };
 				carguments.remove(query, function(err, docs) {
 					callback(docs);
 				});
@@ -121,15 +273,12 @@ function Arguments(app) {
 	this.fetchArguments = function() {
 		app.dbConnect(function(err, db) {
 			var carguments = db.collection('arguments');
-			carguments.find({}).toArray(function(err, docs) {
+			carguments.find({ state: "published" }).toArray(function(err, docs) {
 				console.log("arguments " + JSON.stringify(docs));
 
-				var shoulddelete = "";
-				
 				docs.forEach(function(item) {
 					var name = item.argument;
-					if(name.indexOf(" ")>0 || name.indexOf(":")>0) {
-						shoulddelete = name;
+					if(!name || name.indexOf(" ")>0 || name.indexOf(":")>0) {
 						console.log("not adding " + name);
 					} else {
 						console.log("Adding action name:" + item.argument + " text:" + item.text);
@@ -143,17 +292,16 @@ function Arguments(app) {
 				});
 
 				db.close();
-				
-				if(shoulddelete.length>0) {
-					self.deleteArgument(shoulddelete, function() {
-						console.log("deleted " + shoulddelete);
-					});
-				}
-				
 			});
 		});
 	}
 
+	this.generateId = function() {
+		var firstPart = (Math.random() * 46656) | 0;
+		firstPart = ("a" + firstPart.toString(36)).slice(-3);
+		return firstPart;
+	}
+	
 	this.responseArgument = function(message, name) {
 		app.dbConnect(function(err, db) {
 			var carguments = db.collection('arguments');

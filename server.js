@@ -60,7 +60,11 @@ app.actions.help = { channel: "all",
 			if(list.length > 0) {
 				list += ", ";
 			}
-			list += key;
+			if(app.actions[key] && app.actions[key].view) {
+				list += app.actions[key].view;
+			} else {
+				list += key;
+			}
 		}
 		
 		message.reply("Usage: !action eg !list_arguments. List of actions : " + list);
@@ -98,7 +102,8 @@ client.on('ready', () => {
 
 client.on('message', message => {
 	// console.log("got message " + message.content + " on channel " + message.channel);
-	var first = message.content.split(" ")[0].trim();
+	var split = message.content.split(" ");
+	var first = split[0].trim();
 	
 	first = first.substr(1).toLowerCase();
 	first = first.replace(/[^A-Za-z0-9]/g, "");
@@ -116,7 +121,12 @@ client.on('message', message => {
 			if(!app.checkRights(action, message)) {
 				console.log("ignoring admin command " + saction + " from " + message.author.username);
 			} else {
-				action.handle(message);
+				var rest = message.content.substr(message.content.indexOf(" ")).trim();
+				if(!action.needparams || split.length > 1) {
+					action.handle(message, rest);
+				} else {
+					message.reply("This actions needs parameters");
+				}
 			}
 		} else {
 			message.reply('unknown ACTION \"' + saction + '\"');
