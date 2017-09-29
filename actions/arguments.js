@@ -45,7 +45,7 @@ function Arguments(app) {
 	};
 		
 	this.actions.deleteargument = {
-		channel: "admin",
+		channel: "bot-admin",
 		view: "delete_argument",
 		needparams: true,
 		handle: function(message, rest) {
@@ -83,7 +83,7 @@ function Arguments(app) {
 	}
 
 	this.actions.publishargument = {
-		channel: "admin",
+		channel: "bot-admin",
 		view: "publish_argument",
 		needsargument: true,
 		handle: function(message, rest) {
@@ -110,7 +110,7 @@ function Arguments(app) {
 	};
 
 	this.actions.unpublishargument = {
-		channel: "admin",
+		channel: "bot-admin",
 		view: "unpublish_argument",
 		needsargument: true,
 		handle: function(message, rest) {
@@ -136,7 +136,7 @@ function Arguments(app) {
 	};
 
 	this.actions.fixarguments = {
-		channel: "admin",
+		channel: "bot-admin",
 		view: "fix_arguments",
 		handle: function(message, rest) {
 			app.dbConnect(function(err, db) {
@@ -185,7 +185,7 @@ function Arguments(app) {
 	};
 	
 	this.actions.listargumentsuggestions = {
-		channel: "admin",
+		channel: "bot-admin",
 		view: "list_argument_suggestions",
 		handle: function(message, rest) {
 			app.dbConnect(function(err, db) {
@@ -217,7 +217,7 @@ function Arguments(app) {
 	};
 
 	this.actions.viewargument = {
-		channel: "admin",
+		channel: "bot-admin",
 		view: "view_argument",
 		needsargument: true,
 		handle: function(message, rest) {

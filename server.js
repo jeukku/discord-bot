@@ -35,14 +35,31 @@ function App() {
 	this.arguments = require('./actions/arguments.js').init(this);
 	
 	this.checkRights = function(action, message) {
-		if(action.channel == "admin") {
-			if(message.channel.name == ADMIN_CHANNEL_NAME) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
+		var okrole;
+		var guild = message.guild.roles[client.guilds[message.guild.id]];
+
+		console.log("guild " + JSON.stringify(guild));
+		console.log("guilds " + JSON.stringify(client.guilds));
+		console.log("message guild id  " + JSON.stringify(message.guild.id));
+		
+		for(var key in message.guild.roles) {
+			var role = message.guild.roles[key];
+			console.log("role id " + role.id);
+			console.log("role name " + role.name);
+		}
+		
+		console.log("message.guild " + message.guild);
+		console.log("message.guild.roles " + message.guild.roles);
+		console.log("action.channel " + action.channel);
+		
+		console.log("okrole " + role);
+		
+		if(action.channel == "all") {
 			return true;
+		} else if(role && role.members[message.author.id]) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 	
@@ -81,7 +98,7 @@ app.actions.record = {
 	channel: "admin",
 	handle: function(message) {
 		console.log("Should record " + message.content);
-		
+
 		if (message.member.voiceChannel) {
 			message.member.voiceChannel.join().then(connection => { 
 				message.reply('I have successfully connected to the channel!');
@@ -97,6 +114,7 @@ app.actions.record = {
 
 client.on('ready', () => {
 	console.log('I am ready!');
+	client.syncGuilds();
 	//podbot = require('./podbot/index.js').create(ADMIN_CHANNEL_NAME, client);
 });
 
