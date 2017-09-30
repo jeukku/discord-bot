@@ -75,7 +75,7 @@ function Arguments(app) {
 				
 				carguments.update(query, update, { upsert: true }, function(err, docs) {
 					console.log("reply");
-					message.reply("stored suggestion:" + argumentname + " by " + username + " text:" + text);
+					message.reply("stored suggestion:" + argumentname + " by " + username + " text:" + text + " id:" + update.argumentid);
 					db.close();
 				});
 			});
@@ -297,9 +297,14 @@ function Arguments(app) {
 	}
 
 	this.generateId = function() {
-		var firstPart = (Math.random() * 46656) | 0;
-		firstPart = ("a" + firstPart.toString(36)).slice(-3);
-		return firstPart;
+		var nid = "";
+		
+		while(nid.length<7) {
+			var n = (Math.random() * 46656) | 0;
+			nid += ("" + n.toString(36)).slice(-8);
+		}
+		
+		return nid;
 	}
 	
 	this.responseArgument = function(message, name) {
