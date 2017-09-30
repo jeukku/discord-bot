@@ -57,13 +57,17 @@ app.actions.help = { channel: "all",
 	handle: function(message) {
 		var list = "";
 		for(var key in app.actions) {
-			if(list.length > 0) {
-				list += ", ";
-			}
-			if(app.actions[key] && app.actions[key].view) {
-				list += app.actions[key].view;
-			} else {
-				list += key;
+			var action = app.actions[key];
+			if(action && app.checkRights(action, message)) {
+				if(list.length > 0) {
+					list += ", ";
+				}
+
+				if(action.view) {
+					list += app.actions[key].view;
+				} else {
+					list += key;
+				}
 			}
 		}
 		
