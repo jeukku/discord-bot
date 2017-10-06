@@ -259,7 +259,7 @@ function Arguments(app) {
 	};
 
 	this.actions.listargumentsinfo = {
-		channel: "all",
+		channel: "admin",
 		view: "list_arguments_info",
 		handle: function(message, rest) {
 			app.dbConnect(function(err, db) {
