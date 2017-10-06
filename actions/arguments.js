@@ -64,6 +64,8 @@ function Arguments(app) {
 		needparams: true,
 		handle: function(message, rest) {
 			var argumentname = rest.substr(0, rest.indexOf(" ")).trim();
+			argumentname = app.cleanUp(argumentname);
+			
 			var text = rest.substr(rest.indexOf(":") + 1).trim();
 			var username = message.author.username;
 			app.dbConnect(function(err, db) {
@@ -75,7 +77,7 @@ function Arguments(app) {
 				
 				carguments.update(query, update, { upsert: true }, function(err, docs) {
 					console.log("reply");
-					message.reply("stored suggestion:" + argumentname + " by " + username + " text:" + text + " id:" + update.argumentid);
+					message.reply("stored suggestion:" + argumentname + " by " + username + " with id " + update.argumentid);
 					db.close();
 				});
 			});
@@ -332,7 +334,7 @@ function Arguments(app) {
 		}
 		
 		return nid;
-	}
+	}		
 	
 	this.responseArgument = function(message, name) {
 		app.dbConnect(function(err, db) {
