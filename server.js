@@ -48,7 +48,7 @@ function App() {
 	
 	this.cleanUp = function(str) {
 		if(str) {
-			str = ("" + str).substr(1).toLowerCase();
+			str = ("" + str).toLowerCase();
 			str = str.replace(/[^A-Za-z0-9]/g, "");
 			str = str.trim();
 			return str;
