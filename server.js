@@ -46,6 +46,17 @@ function App() {
 		}
 	}
 	
+	this.cleanUp = function(str) {
+		if(str) {
+			str = ("" + str).substr(1).toLowerCase();
+			str = str.replace(/[^A-Za-z0-9]/g, "");
+			str = str.trim();
+			return str;
+		} else {
+			return "";
+		}
+	}
+	
 	this.dbConnect = function(callback) {
 		MongoClient.connect(dburl, callback);
 	}
