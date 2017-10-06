@@ -90,7 +90,13 @@ app.actions.help = { channel: "all",
 
 app.actions.uptime = { channel: "all",
 	handle: function(message) {
-		message.reply("Uptime " + process.uptime());
+		app.strings.get("UPTIME", "" + process.uptime(), function(err, str) {
+			if(str) {
+				message.reply(str);
+			} else {
+				message.reply("ERROR " + err);
+			}
+		});
 	}
 };
 
