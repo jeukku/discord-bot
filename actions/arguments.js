@@ -36,14 +36,20 @@ function Arguments(app) {
 		if(!argument) {
 			argument = this.allarguments[first.toUpperCase()];
 		}
-		
+
 		if(argument) {
 			argument.handle(message);
 		} else {
-			message.reply('I\'m not sure what \"' + first + '\" means, can you tell me? If you suggest an explanation and mention @jeukku I can learn.');
+			app.strings.get("UNKNOWN_RESPONSE", first, function(err, str) {
+				if(err) {
+					message.reply("ERROR " + err);
+				} else {
+					message.reply(str);
+				}
+			});
 		}	
 	};
-		
+
 	this.actions.deleteargument = {
 		channel: "admin",
 		view: "delete_argument",
