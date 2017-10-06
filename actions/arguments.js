@@ -153,9 +153,7 @@ function Arguments(app) {
 					
 					var bulk = carguments.initializeOrderedBulkOp();
 					
-					docs.forEach(function(item) {
-						message.reply(JSON.stringify(item));
-						
+					docs.forEach(function(item) {						
 						if(!item.argumentid) {
 							var newid = self.generateId();
 							bulk.find( { _id: item._id } ).updateOne( { $set: { argumentid: newid }});
@@ -168,9 +166,9 @@ function Arguments(app) {
 						}
 
 
-						if(!item.argument) {
+						if(!item.argument || !item.argument.replace(/[^A-Za-z0-9]/g, "").length == 0) {
 							bulk.find( { _id: item._id } ).removeOne();
-							fixed += "deleting " +  item.argument + "[" + item._id + "]";
+							fixed += "deleting " +  item.argument + "[" + item._id + "]\n";
 						}
 
 					 });
