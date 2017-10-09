@@ -230,10 +230,18 @@ function Arguments(app) {
 			app.dbConnect(function(err, db) {
 				console.log("viewing argument " + rest);
 				var carguments = db.collection('arguments');
-				carguments.find({ argument: rest }).toArray(function(err, docs) {
+				carguments.find({ argumentid: rest }).toArray(function(err, docs) {
 					console.log("arguments " + JSON.stringify(docs));
+					var a = docs[0];
+					var smes = "\"" + a.argument + "\"";
+					if(a.state=="suggestion") {
+						smes += " suggested";
+					}
 					
-					message.reply(JSON.stringify(docs));
+					smes += " by " + a.author + "\n";
+					smes += a.text;
+					
+					message.reply(smes);
 					db.close();
 				});
 			});
@@ -307,6 +315,10 @@ function Arguments(app) {
 
 	this.fetchArguments = function() {
 		app.dbConnect(function(err, db) {
+			if(err) {
+				console.log("ERROR " + err);
+			}
+
 			var carguments = db.collection('arguments');
 			carguments.find({ state: "published" }).toArray(function(err, docs) {
 				console.log("arguments " + JSON.stringify(docs));
