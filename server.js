@@ -19,7 +19,6 @@
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
-var sleep = require('sleep');
 
 var MongoClient = require('mongodb').MongoClient, assert = require('assert');
 var dburl = 'mongodb://localhost:27017/tzmfi_discord';
@@ -162,8 +161,6 @@ client.on('message', message => {
 		// message.reply("unknown message " + message.content.replace(/\@/g, "FOO") + " user: " + message.author.username);
 	}
 });
-
-sleep.sleep(1);
 
 app.arguments.fetchArguments();
 
