@@ -1,0 +1,1 @@
+{"virtualbox":{"/git":{"create":true,"owner":"root","group":"root","mount_options":["dmode=777,fmode=666"],"guestpath":"/git","hostpath":"C:/Kehitys/oma/Kehitys/git","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"C:/Kehitys/oma/Kehitys/git/discord-bot/vagrant","disabled":false,"__vagrantfile":true}}}

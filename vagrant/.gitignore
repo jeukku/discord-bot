@@ -59,6 +59,6 @@ typings/
 
 
 
-.vagrant
+.vagrant/
 *.stackdump
 podbot
