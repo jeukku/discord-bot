@@ -42,9 +42,12 @@ function Strings(app) {
 				
 				var query = { name: strname };
 				var item = { name: strname, text: text };
-				cstrings.update( query, item, { upsert: true }, function(err, docs) {
-					message.reply("set string \"" + strname + "\" to \"" + text + "\"");
-					db.close();
+				cstrings.remove(query, function(err) {
+					console.log("removed strings " + strname);
+					cstrings.update( query, item, { upsert: true }, function(err, docs) {
+						message.reply("set string \"" + strname + "\" to \"" + text + "\"");
+						db.close();
+					});					
 				});
 			});
 		}
