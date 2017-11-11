@@ -17,8 +17,12 @@
 
 'use strict';
 
+var express 		= require('express'), serveStatic = require('serve-static'); 
+const PORT=18880;
+
 const Discord = require('discord.js');
 const client = new Discord.Client();
+
 
 var MongoClient = require('mongodb').MongoClient, assert = require('assert');
 var dburl = 'mongodb://localhost:27017/tzmfi_discord';
@@ -34,7 +38,10 @@ function App() {
 	this.arguments = require('./actions/arguments.js').init(this);
 	this.strings = require('./actions/strings.js').init(this);
 	
-
+	
+	
+	
+		
 	this.checkRights = function(action, message) {
 		if(action.channel == "admin") {
 			if(message.channel.name == ADMIN_CHANNEL_NAME) {
@@ -64,6 +71,7 @@ function App() {
 }
 
 var app = new App();
+var exp = express();
 
 app.actions.help = { channel: "all", 
 	handle: function(message) {
@@ -162,7 +170,29 @@ client.on('message', message => {
 	}
 });
 
+exp.get("/list", function(req, res) {
+	res.writeHead(200, {'Content-Type': 'text/html'});
+
+	app.arguments.listArguments(function(db, docs) {
+		var list = "";
+		docs.forEach(function(item) {
+			if(list.length > 0) {
+				list += ", ";
+			}
+
+			list += "\nname:" + item.argument;
+			list += "\nargumentid:" + item.argumentid;
+			list += "\nauthor:" + item.author;
+			list += "\n";
+		});
+
+		console.log("list " + list);
+		db.close();
+	});
+});
+
 app.arguments.fetchArguments();
+exp.listen(PORT);
 
+console.log("token " + process.env.DISCORD_BOT_LOGIN);
 client.login(process.env.DISCORD_BOT_LOGIN);
-

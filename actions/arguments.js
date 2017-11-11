@@ -278,31 +278,36 @@ function Arguments(app) {
 		channel: "admin",
 		view: "list_arguments_info",
 		handle: function(message, rest) {
-			app.dbConnect(function(err, db) {
-				console.log("listing arguments");
-				var carguments = db.collection('arguments');
-				carguments.find({ state: "published" }).toArray(function(err, docs) {
-					console.log("arguments " + JSON.stringify(docs));
-					
-					var list = "";
-					docs.forEach(function(item) {
-						if(list.length > 0) {
-							list += ", ";
-						}
+			self.listArguments(function(db, docs) {
+				var list = "";
+				docs.forEach(function(item) {
+					if(list.length > 0) {
+						list += ", ";
+					}
 
-						list += "\nname:" + item.argument;
-						list += "\nargumentid:" + item.argumentid;
-						list += "\nauthor:" + item.author;
-						list += "\n";
-					});
-
-					message.reply("Arguments " + list);
-					db.close();
+					list += "\nname:" + item.argument;
+					list += "\nargumentid:" + item.argumentid;
+					list += "\nauthor:" + item.author;
+					list += "\n";
 				});
+
+				message.reply("Arguments " + list);
+				db.close();
 			});
 		}
 	};
 
+	this.listArguments = function(callback) {
+		app.dbConnect(function(err, db) {
+			console.log("listing arguments");
+			var carguments = db.collection('arguments');
+			carguments.find({ state: "published" }).toArray(function(err, docs) {
+				console.log("arguments " + JSON.stringify(docs));
+				callback(db, docs);
+			});
+		});
+	};
+	
 	this.deleteArgument = function(argumentid, callback) {
 			app.dbConnect(function(err, db) {
 				var carguments = db.collection('arguments');
