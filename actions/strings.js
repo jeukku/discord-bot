@@ -43,7 +43,7 @@ function Strings(app) {
 				var query = { name: strname };
 				var item = { name: strname, text: text };
 				cstrings.update( query, item, { upsert: true }, function(err, docs) {
-					message.reply("set string \"" + strname + "\"");
+					message.reply("set string \"" + strname + "\" to \"" + text + "\"");
 					db.close();
 				});
 			});
