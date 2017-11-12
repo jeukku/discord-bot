@@ -171,29 +171,29 @@ client.on('message', message => {
 });
 
 exp.get("/list", function(req, res) {
-	res.writeHead(200, {'Content-Type': 'text/html'});
+	console.log("\"list\" called");
 
 	app.arguments.listArguments(function(db, docs) {
-		var list = "";
-		docs.forEach(function(item) {
-			if(list.length > 0) {
-				list += ", ";
-			}
+		var html = "<html><head><title>TZM</title></head><body>\n";
 
-			list += "\nname:" + item.argument;
-			list += "\nargumentid:" + item.argumentid;
-			list += "\nauthor:" + item.author;
-			list += "\n";
+		docs.forEach(function(item) {
+			html += "<div>\n";
+			html += "<h2>" + item.argument + "</h2>\n";
+			html += "<h3>by " + item.author + "</h3>";
+			html += "<p>" + item.text + "</p>";
+			html += "</div>\n\n";
 		});
 
-		console.log("list " + list);
+		html += "</body></html>";
+		
 		db.close();
-		res.send(list);
+		res.send(html);
 	});
 });
 
 app.arguments.fetchArguments();
-exp.listen(PORT);
 
-console.log("token " + process.env.DISCORD_BOT_LOGIN);
+exp.listen(PORT);
+console.log("Listening to port " + PORT);
+
 client.login(process.env.DISCORD_BOT_LOGIN);
