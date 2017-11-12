@@ -18,7 +18,7 @@
 'use strict';
 
 var express 		= require('express'), serveStatic = require('serve-static'); 
-const PORT=18880;
+const PORT=18881;
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
