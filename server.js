@@ -188,6 +188,7 @@ exp.get("/list", function(req, res) {
 
 		console.log("list " + list);
 		db.close();
+		res.send(list);
 	});
 });
 
