@@ -32,6 +32,7 @@ const ADMIN_CHANNEL_NAME = "bot-admin";
 
 var podbot;
 
+
 function App() {
 	this.actions = {};
 	
@@ -67,6 +68,10 @@ function App() {
 	
 	this.dbConnect = function(callback) {
 		MongoClient.connect(dburl, callback);
+	}
+	
+	this.isSet = function(o) {
+		return typeof o !== 'undefined';
 	}
 }
 

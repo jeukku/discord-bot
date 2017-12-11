@@ -174,9 +174,9 @@ function Arguments(app) {
 						}
 
 
-						if(!item.argument || !item.argument.replace(/[^A-Za-z0-9]/g, "").length == 0) {
-							bulk.find( { _id: item._id } ).removeOne();
-							fixed += "deleting " +  item.argument + "[" + item._id + "]\n";
+						if(!app.isSet(item.argument) || !item.argument.replace(/[A-Za-z0-9]/g, "").length == 0) {
+							//bulk.find( { _id: item._id } ).removeOne();
+							fixed += "deleting " +  item.argument + "[" + item._id + "] isSet:" + app.isSet(item.argument) + " \n";
 						}
 
 					 });
