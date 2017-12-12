@@ -130,18 +130,34 @@ function Arguments(app) {
 					console.log("publish all");
 					
 					var carguments = db.collection('arguments');
-					var update = { state: "published" };
 					
-					carguments.find({}).toArray(function(err, docs) {
+					carguments.find({ state : "suggestion" }).toArray(function(err, docs) {
+						var reply = "published:\n";
+						
+						console.log("docs " + JSON.stringify(docs));
+						console.log("docs length " + docs.length);
+						
+						var count = 0;
+						var docslength = docs.length;
+						
 						docs.forEach(function(item) {													
 							item.state = "published";
 							carguments.update( { _id: item._id }, item, function(err, ndocs) {
-								message.reply("published " + item.argumentid + " " + JSON.stringify(ndocs));
+								count++;
+																
+								console.log("published " + JSON.stringify(ndocs));
+								reply += "  " + item.argumentid + " " + JSON.stringify(ndocs) + "\n";
+								
+								if(count==docslength) {
+									message.reply(reply);
+									console.log("sent reply " + reply);
+									
+									db.close();
+									self.fetchArguments();									
+								}
 							});
 						});
-
-						db.close();
-						self.fetchArguments();
+						
 					});
 
 				});
