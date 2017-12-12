@@ -52,7 +52,7 @@ function Strings(app) {
 
 	this.actions.liststrings = {
 			channel: "admin",
-			view: "list_string",
+			view: "list_strings",
 			needparams: false,
 			handle: function(message, rest) {
 				app.dbConnect(function(err, db) {
