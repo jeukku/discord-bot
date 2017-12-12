@@ -71,22 +71,27 @@ function Arguments(app) {
 		handle: function(message, rest) {
 			var argumentname = rest.substr(0, rest.indexOf(" ")).trim();
 			argumentname = app.cleanUp(argumentname);
-			
-			var text = rest.substr(rest.indexOf(":") + 1).trim();
-			var username = message.author.username;
-			app.dbConnect(function(err, db) {
-				console.log("connected");
-				
-				var carguments = db.collection('arguments');
-				var query = { argument: argumentname, author: username, state: "suggestion" };
-				var update = { argument: argumentname, text: text, author: username, state: "suggestion", argumentid: self.generateId() }; 
-				
-				carguments.update(query, update, { upsert: true }, function(err, docs) {
-					console.log("reply");
-					message.reply("stored suggestion:" + argumentname + " by " + username + " with id " + update.argumentid);
-					db.close();
+			if(argumentname.trim().length<4) {
+				app.strings.get("ARGUMENT_NAME_TOO_SHORT", "" + argumentname, function(err, str) {
+					message.reply("" + str);
 				});
-			});
+			} else {
+				var text = rest.substr(rest.indexOf(":") + 1).trim();
+				var username = message.author.username;
+				app.dbConnect(function(err, db) {
+					console.log("connected");
+					
+					var carguments = db.collection('arguments');
+					var query = { argument: argumentname, author: username, state: "suggestion" };
+					var update = { argument: argumentname, text: text, author: username, state: "suggestion", argumentid: self.generateId() }; 
+					
+					carguments.update(query, update, { upsert: true }, function(err, docs) {
+						console.log("reply");
+						message.reply("stored suggestion:" + argumentname + " by " + username + " with id " + update.argumentid);
+						db.close();
+					});
+				});
+			}
 		}
 	}
 
@@ -116,6 +121,33 @@ function Arguments(app) {
 			});
 		}
 	};
+
+	this.actions.publishall = {
+			channel: "admin",
+			view: "publish_all",
+			handle: function(message, rest) {
+				app.dbConnect(function(err, db) {
+					console.log("publish all");
+					
+					var carguments = db.collection('arguments');
+					var update = { state: "published" };
+					
+					carguments.find({}).toArray(function(err, docs) {
+						docs.forEach(function(item) {													
+							item.state = "published";
+							carguments.update( { _id: item._id }, item, function(err, ndocs) {
+								message.reply("published " + item.argumentid + " " + JSON.stringify(ndocs));
+							});
+						});
+
+						db.close();
+						self.fetchArguments();
+					});
+
+				});
+			}
+		};
+
 
 	this.actions.unpublishargument = {
 		channel: "admin",

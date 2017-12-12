@@ -78,12 +78,13 @@ function Strings(app) {
 			var query = { name: name };
 			cstrings.findOne(query, function(err, item) {
 				if(err) {
-					callback(err, null);
+					var defaultvalue = "default value for string " + name;
+					callback(err, defaultvalue);
 				} else if(item) {
 					db.close();
 					callback(err, item.text.replace("{REPLACE}", param));
 				} else {
-					callback("string \"" + name + "\" not found", null);
+					callback(err, "string \"" + name + "\" not found");
 				}
 			});
 		});
