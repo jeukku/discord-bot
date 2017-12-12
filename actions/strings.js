@@ -50,6 +50,27 @@ function Strings(app) {
 		}
 	}
 
+	this.actions.liststrings = {
+			channel: "admin",
+			view: "list_string",
+			needparams: false,
+			handle: function(message, rest) {
+				app.dbConnect(function(err, db) {
+					var cstrings = db.collection('strings');
+					
+					cstrings.find({ }).toArray(function(err, docs) {
+						var reply = "STRINGS:\n";
+						docs.forEach(function(item) {						
+							reply += "string \"" + item.name + "\" is \"" + item.text + "\"\n";
+						});
+						message.reply(reply);
+						
+						db.close();
+					});					
+				});
+			}
+		}
+
 	this.get = function(name, param, callback) {
 		app.dbConnect(function(err, db) {
 			var cstrings = db.collection('strings');
