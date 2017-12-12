@@ -64,9 +64,9 @@ function Arguments(app) {
 		}
 	}
 
-	this.actions.suggestargument = {
+	this.actions.suggest = {
 		channel: "all",
-		view: "suggest_argument",
+		view: "suggest",
 		needparams: true,
 		handle: function(message, rest) {
 			var argumentname = rest.substr(0, rest.indexOf(" ")).trim();
@@ -90,9 +90,9 @@ function Arguments(app) {
 		}
 	}
 
-	this.actions.publishargument = {
+	this.actions.publish = {
 		channel: "admin",
-		view: "publish_argument",
+		view: "publish",
 		needsargument: true,
 		handle: function(message, rest) {
 			app.dbConnect(function(err, db) {

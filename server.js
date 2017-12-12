@@ -38,10 +38,6 @@ function App() {
 	
 	this.arguments = require('./actions/arguments.js').init(this);
 	this.strings = require('./actions/strings.js').init(this);
-	
-	
-	
-	
 		
 	this.checkRights = function(action, message) {
 		if(action.channel == "admin") {
