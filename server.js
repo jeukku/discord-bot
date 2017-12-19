@@ -160,7 +160,7 @@ client.on('message', message => {
 				}
 			}
 		} else {
-			message.reply('unknown ACTION \"' + saction + '\"');
+			message.reply(app.string.get("UNKNOWN_ACTION", saction));
 		}
 	} else if(message.content.startsWith("?")) {
 		app.arguments.handle(first, message);
