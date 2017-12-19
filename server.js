@@ -138,7 +138,9 @@ client.on('message', message => {
 	// console.log("got message " + message.content + " on channel " + message.channel);
 	var split = message.content.split(" ");
 	var first = split[0].trim();
-	
+
+	var actionchar = first.substr(0, 1);
+		
 	first = first.substr(1).toLowerCase();
 	first = first.replace(/[^A-Za-z0-9]/g, "");
 	
@@ -147,7 +149,9 @@ client.on('message', message => {
 		// ignore
 	} else if(message.content.trim().length < 4) {
 		// ignore
-	} else if(message.content.startsWith("!")) {
+	} else if(message.author.username.match("/\-bot/i")) {
+		console.log("ignore bot message");
+	} else if(actionchar=="!" || actionchar=="?") {
 		var saction = first;
 		console.log("action " + saction);
 		var action = app.actions[saction];
@@ -163,14 +167,8 @@ client.on('message', message => {
 				}
 			}
 		} else {
-			message.reply(app.string.get("UNKNOWN_ACTION", saction));
+			app.arguments.handle(first, message);
 		}
-	} else if(message.content.startsWith("?")) {
-		app.arguments.handle(first, message);
-	} else if (message.content === 'ping') {
-		// message.reply('pong DOOP');
-	} else if(message.author.username != "tzm-bot") {
-		// message.reply("unknown message " + message.content.replace(/\@/g, "FOO") + " user: " + message.author.username);
 	}
 });
 
