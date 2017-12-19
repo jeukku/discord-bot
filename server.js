@@ -63,7 +63,10 @@ function App() {
 	}
 	
 	this.dbConnect = function(callback) {
-		MongoClient.connect(dburl, callback);
+		MongoClient.connect(dburl, (err, dbc) => {
+				const db = dbc.db('tzmfi_discord');
+				callback(err, dbc, db);	
+		});
 	}
 	
 	this.isSet = function(o) {
@@ -197,4 +200,10 @@ app.arguments.fetchArguments();
 exp.listen(PORT);
 console.log("Listening to port " + PORT);
 
-client.login(process.env.DISCORD_BOT_LOGIN);
+console.log("token " + process.env.DISCORD_BOT_LOGIN);
+
+client.login(process.env.DISCORD_BOT_LOGIN).then(function() {
+	console.log("login success");
+}, function(err) {
+	console.log("login failed " + err);
+});

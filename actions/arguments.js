@@ -78,7 +78,7 @@ function Arguments(app) {
 			} else {
 				var text = rest.substr(rest.indexOf(":") + 1).trim();
 				var username = message.author.username;
-				app.dbConnect(function(err, db) {
+				app.dbConnect(function(err, dbclient, db) {
 					console.log("connected");
 					
 					var carguments = db.collection('arguments');
@@ -88,7 +88,7 @@ function Arguments(app) {
 					carguments.update(query, update, { upsert: true }, function(err, docs) {
 						console.log("reply");
 						message.reply("stored suggestion:" + argumentname + " by " + username + " with id " + update.argumentid);
-						db.close();
+						dbclient.close();
 					});
 				});
 			}
@@ -100,7 +100,7 @@ function Arguments(app) {
 		view: "publish",
 		needsargument: true,
 		handle: function(message, rest) {
-			app.dbConnect(function(err, db) {
+			app.dbConnect(function(err, dbclient, db) {
 				console.log("storeargument content \"" + message.content + "\"");
 				var argumentid = rest;
 				
@@ -114,7 +114,7 @@ function Arguments(app) {
 					item.state = "published";
 					carguments.update( { _id: item._id }, item, function(err, docs) {
 						message.reply("published " + argumentid + " " + JSON.stringify(docs));
-						db.close();
+						dbclient.close();
 						self.fetchArguments();
 					});
 				});
@@ -126,7 +126,7 @@ function Arguments(app) {
 			channel: "admin",
 			view: "publish_all",
 			handle: function(message, rest) {
-				app.dbConnect(function(err, db) {
+				app.dbConnect(function(err, dbclient, db) {
 					console.log("publish all");
 					
 					var carguments = db.collection('arguments');
@@ -152,7 +152,7 @@ function Arguments(app) {
 									message.reply(reply);
 									console.log("sent reply " + reply);
 									
-									db.close();
+									dbclient.close();
 									self.fetchArguments();									
 								}
 							});
@@ -170,7 +170,7 @@ function Arguments(app) {
 		view: "unpublish_argument",
 		needsargument: true,
 		handle: function(message, rest) {
-			app.dbConnect(function(err, db) {
+			app.dbConnect(function(err, dbclient, db) {
 				console.log("unpublishargument content \"" + message.content + "\"");
 				var argumentid = rest;
 				
@@ -183,7 +183,7 @@ function Arguments(app) {
 					item.state = "suggestion";
 					carguments.update( { _id: item._id }, item, function(err, docs) {
 						message.reply("unpublished " + argumentid + " " + JSON.stringify(docs));
-						db.close();
+						dbclient.close();
 						self.fetchArguments();
 					});
 				});
@@ -195,7 +195,7 @@ function Arguments(app) {
 		channel: "admin",
 		view: "fix_arguments",
 		handle: function(message, rest) {
-			app.dbConnect(function(err, db) {
+			app.dbConnect(function(err, dbclient, db) {
 				console.log("listing argumentsuggestions");
 				var carguments = db.collection('arguments');
 				carguments.find({ }).toArray(function(err, docs) {
@@ -231,7 +231,7 @@ function Arguments(app) {
 
 					bulk.execute(function(err, result) {
 						message.reply("fixed " + fixed);
-						db.close();
+						dbclient.close();
 					});
 				});
 			});
@@ -242,7 +242,7 @@ function Arguments(app) {
 		channel: "admin",
 		view: "list_argument_suggestions",
 		handle: function(message, rest) {
-			app.dbConnect(function(err, db) {
+			app.dbConnect(function(err, dbclient, db) {
 				console.log("listing argumentsuggestions");
 				var carguments = db.collection('arguments');
 				carguments.find({ state: { $not: /published/ }}).toArray(function(err, docs) {
@@ -264,7 +264,7 @@ function Arguments(app) {
 					});
 					
 					message.reply("Argumentsuggestions " + list);
-					db.close();
+					dbclient.close();
 				});
 			});
 		}
@@ -275,7 +275,7 @@ function Arguments(app) {
 		view: "view_argument",
 		needsargument: true,
 		handle: function(message, rest) {
-			app.dbConnect(function(err, db) {
+			app.dbConnect(function(err, dbclient, db) {
 				console.log("viewing argument " + rest);
 				var carguments = db.collection('arguments');
 				carguments.find({ argumentid: rest }).toArray(function(err, docs) {
@@ -290,7 +290,7 @@ function Arguments(app) {
 					smes += a.text;
 					
 					message.reply(smes);
-					db.close();
+					dbclient.close();
 				});
 			});
 		}
@@ -300,7 +300,7 @@ function Arguments(app) {
 		channel: "all",
 		view: "list_arguments",
 		handle: function(message, rest) {
-			app.dbConnect(function(err, db) {
+			app.dbConnect(function(err, dbclient, db) {
 				console.log("listing arguments");
 				var carguments = db.collection('arguments');
 				carguments.find({ state: "published" }).toArray(function(err, docs) {
@@ -316,7 +316,7 @@ function Arguments(app) {
 					});
 
 					message.reply("Arguments " + list);
-					db.close();
+					dbclient.close();
 				});
 			});
 		}
@@ -340,13 +340,13 @@ function Arguments(app) {
 				});
 
 				message.reply("Arguments " + list);
-				db.close();
+				dbclient.close();
 			});
 		}
 	};
 
 	this.listArguments = function(callback) {
-		app.dbConnect(function(err, db) {
+		app.dbConnect(function(err, dbclient, db) {
 			console.log("listing arguments");
 			var carguments = db.collection('arguments');
 			carguments.find({ state: "published" }).toArray(function(err, docs) {
@@ -357,7 +357,7 @@ function Arguments(app) {
 	};
 	
 	this.deleteArgument = function(argumentid, callback) {
-			app.dbConnect(function(err, db) {
+			app.dbConnect(function(err, dbclient, db) {
 				var carguments = db.collection('arguments');
 				var query = { argumentid: argumentid };
 				carguments.remove(query, function(err, docs) {
@@ -367,7 +367,7 @@ function Arguments(app) {
 	}
 
 	this.fetchArguments = function() {
-		app.dbConnect(function(err, db) {
+		app.dbConnect(function(err, dbclient, db) {
 			if(err) {
 				console.log("ERROR " + err);
 			}
@@ -391,7 +391,7 @@ function Arguments(app) {
 					}
 				});
 
-				db.close();
+				dbclient.close();
 			});
 		});
 	}
@@ -408,7 +408,7 @@ function Arguments(app) {
 	}		
 	
 	this.responseArgument = function(message, name) {
-		app.dbConnect(function(err, db) {
+		app.dbConnect(function(err, dbclient, db) {
 			var carguments = db.collection('arguments');
 			carguments.find({ argument: name }).toArray(function(err, docs) {
 				docs.forEach(function(item) {
@@ -421,7 +421,7 @@ function Arguments(app) {
 					message.reply("" + content + "" + item.text);
 				});
 				
-				db.close();
+				dbclient.close();
 			});
 		});
 	}
