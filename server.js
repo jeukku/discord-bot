@@ -200,8 +200,6 @@ app.arguments.fetchArguments();
 exp.listen(PORT);
 console.log("Listening to port " + PORT);
 
-console.log("token " + process.env.DISCORD_BOT_LOGIN);
-
 client.login(process.env.DISCORD_BOT_LOGIN).then(function() {
 	console.log("login success");
 }, function(err) {
