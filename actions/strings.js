@@ -37,14 +37,14 @@ function Strings(app) {
 			var strname = rest.substr(0, rest.indexOf(" ")).trim();
 			var text = rest.substr(rest.indexOf(":") + 1).trim();
 
-			app.dbConnect(function(err, db) {
+			app.dbConnect(function(err, dbclient, db) {
 				var cstrings = db.collection('strings');
 				
 				var query = { name: strname };
 				var item = { name: strname, text: text };
 				cstrings.update( query, item, { upsert: true }, function(err, docs) {
 					message.reply("set string \"" + strname + "\" to \"" + text + "\"");
-					db.close();
+					dbclient.close();
 				});					
 			});
 		}
@@ -55,7 +55,7 @@ function Strings(app) {
 			view: "list_strings",
 			needparams: false,
 			handle: function(message, rest) {
-				app.dbConnect(function(err, db) {
+				app.dbConnect(function(err, dbclient, db) {
 					var cstrings = db.collection('strings');
 					
 					cstrings.find({ }).toArray(function(err, docs) {
@@ -65,14 +65,14 @@ function Strings(app) {
 						});
 						message.reply(reply);
 						
-						db.close();
+						dbclient.close();
 					});					
 				});
 			}
 		}
 
 	this.get = function(name, param, callback) {
-		app.dbConnect(function(err, db) {
+		app.dbConnect(function(err, dbclient, db) {
 			var cstrings = db.collection('strings');
 			
 			var query = { name: name };
@@ -81,7 +81,7 @@ function Strings(app) {
 					var defaultvalue = "default value for string " + name;
 					callback(err, defaultvalue);
 				} else if(item) {
-					db.close();
+					dbclient.close();
 					callback(err, item.text.replace("{REPLACE}", param));
 				} else {
 					callback(err, "string \"" + name + "\" not found");
