@@ -111,27 +111,45 @@ app.actions.uptime = { channel: "all",
 	}
 };
 
-app.actions.record = {
+app.actions.podon = {
 	channel: "admin",
-	handle: function(message) {
+	handle: function(message, rest) {
 		console.log("Should record " + message.content);
-		
-		if (message.member.voiceChannel) {
-			message.member.voiceChannel.join().then(connection => { 
-				message.reply('I have successfully connected to the channel!');
-				var rec = connection.createReceiver();
-				
-			})
-			.catch(console.log);
+
+		var split = rest.split(" ");
+		if(split.length<2) {
+			message.reply("usage !record recordid email (" + rest + ")");
 		} else {
-			message.reply('You need to join a voice channel first!');
+			var recid = split[0].trim();
+			var email = split[1].trim();
+		
+			if (message.member.voiceChannel) {
+				message.reply("starting recordig " + recid + " by " + email);
+				podbot._podon(message, message.member, recid, email);
+			} else {
+				message.reply('You need to join a voice channel first!');
+			}
 		}
 	}
 };
 
+app.actions.podoff = {
+		channel: "admin",
+		handle: function(message, rest) {
+			console.log("Should stop recording " + message.content);
+			if (message.member.voiceChannel) {
+				message.reply("stopping recordig");
+				podbot._status(message);
+				podbot._podoff(message, message.member);
+			} else {
+				message.reply('You need to join a voice channel first!');
+			}
+		}
+	};
+
 client.on('ready', () => {
 	console.log('I am ready!');
-	//podbot = require('./podbot/index.js').create(ADMIN_CHANNEL_NAME, client);
+	podbot = require('./podbot/index.js').create(ADMIN_CHANNEL_NAME, client);
 });
 
 client.on('message', message => {
@@ -197,6 +215,8 @@ app.arguments.fetchArguments();
 
 exp.listen(PORT);
 console.log("Listening to port " + PORT);
+
+client.on("debug", (e) => console.info(e));
 
 client.login(process.env.DISCORD_BOT_LOGIN).then(function() {
 	console.log("login success");

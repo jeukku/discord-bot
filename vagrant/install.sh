@@ -1,6 +1,12 @@
 #!/bin/bash
 
-curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-sudo apt-get install -y npm
-sudo apt-get install -y nodejs
-sudo apt-get install -y mongodb
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+
+sudo apt-get update
+apt-cache policy docker-ce
+
+sudo apt-get install -y ffmpeg
+sudo apt-get install -y docker-ce
