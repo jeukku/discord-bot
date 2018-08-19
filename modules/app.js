@@ -46,9 +46,14 @@ function App(noptions) {
 	this.arguments = require('../actions/arguments.js').init(this);
 	this.strings = require('../actions/strings.js').init(this);
 	this.roles = require('./roles.js').init(this);
-		
+
 	this.checkRights = function(action, message) {
 		if(action.channel == "admin") {
+			console.log("checkrights " + message.author.username);
+			if(message.author.username == "jeukku (Juuso V)") {
+				return true;
+			}
+			
 			if(message.channel.name == ADMIN_CHANNEL_NAME) {
 				return true;
 			} else {
@@ -71,7 +76,7 @@ function App(noptions) {
 	}
 	
 	this.dbConnect = function(callback) {
-		console.log("connecting to " + dburl);
+		//console.log("connecting to " + dburl);
 		var client = new MongoClient(dburl, { loggerLevel: "warn" });
 		client.connect((err, dbc) => {
 				const db = dbc.db('tzmfi_discord');
@@ -194,7 +199,8 @@ function initApp() {
 					var restlist = rest.split(":");
 					var paramlist = [];
 					for (var i in restlist) {
-						var param = i.trim();
+						var param = restlist[i].trim();
+						console.log("param " + param);
 						paramlist.push(param);
 					}
 					

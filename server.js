@@ -40,7 +40,7 @@ client.on('messageReactionAdd', (reaction, user) => {
 client.on("debug", (e) => console.info(e));
 
 client.login(process.env.DISCORD_BOT_LOGIN).then(function() {
-	console.log("login success");
+	console.log("login success");	
 }, function(err) {
 	console.log("login failed " + err);
 });
