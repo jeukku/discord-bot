@@ -27,29 +27,39 @@ module.exports = strings;
 
 function Strings(app) {
 	var self = this;
+	this.app = app;
 	this.actions = app.actions;
 
 	this.actions.setstring = {
 		channel: "admin",
 		view: "set_string",
 		needparams: true,
-		handle: function(message, rest) {
-			var strname = rest.substr(0, rest.indexOf(" ")).trim();
-			var text = rest.substr(rest.indexOf(":") + 1).trim();
-
-			app.dbConnect(function(err, dbclient, db) {
-				var cstrings = db.collection('strings');
-				
-				var query = { name: strname };
-				var item = { name: strname, text: text };
-				cstrings.update( query, item, { upsert: true }, function(err, docs) {
-					message.reply("set string \"" + strname + "\" to \"" + text + "\"");
-					dbclient.close();
-				});					
+		handle: function(message, rest, paramlist) {
+			var strname = paramlist[0];
+			var text = paramlist[1];
+			
+			this.set(strname, text, function() {
+				message.reply("set string \"" + strname + "\" to \"" + text + "\"");				
 			});
 		}
-	}
+	};
 
+	this.set = function(name, value, callback) {
+		console.log("Set string " + name + " -> " + value);
+		this.app.dbConnect(function(err, dbclient, db) {
+			var cstrings = db.collection('strings');
+			
+			console.log("Setting string " + name);
+			
+			var query = { name: name };
+			var item = { name: name, text: value };
+			cstrings.update( query, item, { upsert: true }, function(err, docs) {
+				dbclient.close();
+				callback();
+			});
+		});		
+	};
+	
 	this.actions.liststrings = {
 			channel: "admin",
 			view: "list_strings",
@@ -88,6 +98,6 @@ function Strings(app) {
 				}
 			});
 		});
-	}
+	};
 }
 

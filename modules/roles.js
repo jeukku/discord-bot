@@ -17,38 +17,19 @@
 
 'use strict';
 
-var action_arguments = {
-	setup: function() { console.log("Arguments setup"); },
-	init: function(app) { return new Arguments(app); }
+var roles_arguments = {
+	setup: function() { console.log("Roles setup"); },
+	init: function(app) { return new Roles(app); }
 };
 
-action_arguments.setup();
-module.exports = action_arguments;
+roles_arguments.setup();
+module.exports = roles_arguments;
 
-function Arguments(app) {
+function Roles(app) {
 	var self = this;
-	
-	this.actions = app.actions;
-	this.allarguments = {};
+	this.actions = {}
 	
 	this.handle = function(first, message) {
-		var argument = this.allarguments[first];
-		if(!argument) {
-			argument = this.allarguments[first.toUpperCase()];
-		}
-
-		if(argument) {
-			argument.handle(message);
-		} else {
-			console.log("Argument not found " + first)
-			app.strings.get("UNKNOWN_RESPONSE", first, function(err, str) {
-				if(err) {
-					message.reply("ERROR " + err);
-				} else {
-					message.reply(str);
-				}
-			});
-		}	
 	};
 
 	this.actions.deleteargument = {
