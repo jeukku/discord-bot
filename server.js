@@ -31,16 +31,13 @@ client.on('ready', () => {
 
 client.on('message', app.message);
 
-client.on('messageReactionAdd', (reaction, user) => {
-	var repl = "reaction added " + reaction.emoji.name + " id:" + reaction.emoji.identifier;
-	console.log("messageReactionAdd " + repl);
-	// reaction.message.reply(repl);
-});
+client.on('messageReactionAdd', app.reaction);
 
 client.on("debug", (e) => console.info(e));
 
 client.login(process.env.DISCORD_BOT_LOGIN).then(function() {
 	console.log("login success");	
+	app.init(client);
 }, function(err) {
 	console.log("login failed " + err);
 });

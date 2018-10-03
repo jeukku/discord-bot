@@ -352,7 +352,7 @@ function Arguments(app) {
 			var carguments = db.collection('arguments');
 			carguments.find({ state: "published" }).toArray(function(err, docs) {
 				console.log("arguments " + JSON.stringify(docs));
-				callback(db, docs);
+				callback(dbclient, db, docs);
 			});
 		});
 	};

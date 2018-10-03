@@ -38,5 +38,12 @@ function StringTests() {
 		};
 		
 		app.message(message);
+
+		message = messages.getBotAdmin();
+		message.content = "!getstring " + "UNKNOWN_RESPONSE";
+		message.reply = function(s) {
+			console.log("getstring REPLY " + s);
+		};
+		app.message(message);
 	}
 }

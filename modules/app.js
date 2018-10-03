@@ -46,6 +46,7 @@ function App(noptions) {
 	this.arguments = require('../actions/arguments.js').init(this);
 	this.strings = require('../actions/strings.js').init(this);
 	this.roles = require('./roles.js').init(this);
+	this.news = require('./news.js').init(this);
 
 	this.checkRights = function(action, message) {
 		if(action.channel == "admin") {
@@ -187,6 +188,13 @@ function initApp() {
 			}
 	};
 	
+	app.reaction = function(reaction, user) {
+		
+		var repl = "reaction added " + reaction.emoji.name + " id:" + reaction.emoji.identifier;
+		console.log("messageReactionAdd " + repl);
+		// reaction.message.reply(repl);
+	};
+	
 	app.message = function(message) {
 		app.handleMessage(message, (saction, split) => {
 			console.log("Handling message action " + saction);
@@ -219,7 +227,7 @@ function initApp() {
 	exp.get("/list", function(req, res) {
 		console.log("\"list\" called");
 
-		app.arguments.listArguments(function(db, docs) {
+		app.arguments.listArguments(function(dbclient, db, docs) {
 			var html = "<html><head><title>TZM</title></head><body>\n";
 
 			docs.forEach(function(item) {
@@ -232,13 +240,17 @@ function initApp() {
 
 			html += "</body></html>";
 			
-			db.close();
+			dbclient.close();
 			res.send(html);
 		});
 	});
 
 	app.arguments.fetchArguments();
 
+	app.init = function(client) {
+		app.news.init(client);		
+	}
+	
 	app.shutdown = function() {
 		console.log("app shutdown");
 		if(this.expserver) {

@@ -38,7 +38,7 @@ function Strings(app) {
 			var strname = paramlist[0];
 			var text = paramlist[1];
 			
-			this.set(strname, text, function() {
+			app.strings.set(strname, text, function() {
 				message.reply("set string \"" + strname + "\" to \"" + text + "\"");				
 			});
 		}
@@ -94,10 +94,13 @@ function Strings(app) {
 					dbclient.close();
 					callback(err, item.text.replace("{REPLACE}", param));
 				} else {
+					err = "NOT_FOUND"
 					callback(err, "string \"" + name + "\" not found");
 				}
 			});
 		});
 	};
+
+
 }
 
