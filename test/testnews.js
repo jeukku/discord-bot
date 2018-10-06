@@ -17,16 +17,33 @@
 
 'use strict';
 
-var app = require ("../modules/app.js").init();
+var stests_arguments = {
+		setup: function() { console.log("stests setup"); },
+		init: function() { return new NewsTests(); }
+	};
 
-app.strings.set("UNKNOWN_RESPONSE", "unknown response", function() {
-	console.log("strings set callback");
-});
+var messages = require("./messages.js").init();
 
-var stringstests = require("./teststrings.js").init();
-stringstests.run();
+stests_arguments.setup();
+module.exports = stests_arguments;
 
-var stringstests = require("./testnews.js").init();
-stringstests.run();
+function NewsTests() {
+	this.run = function() {
+		var app = require ("../modules/app.js").init();
 
-console.log("END");
+		var message = messages.getBotAdmin();
+		message.content = "Important message";
+		message.reply = function(s) {
+			console.log("REPLY " + s);
+		};
+		
+		app.message(message);
+		var reactinguser = {}
+		var reaction = {}
+		reaction.emoji = {}
+		reaction.emoji.name = ':thumbsup:'; 
+		reaction.message = message;
+		app.reaction(reaction, reactinguser);
+		
+	}
+}

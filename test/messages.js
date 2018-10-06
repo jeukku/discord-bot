@@ -34,6 +34,7 @@ function TestMessages() {
 		message.reply = function(s) {
 			console.log("MESSAGE reply " + s);
 		};
+		message.id = new Date().getMilliseconds();
 		message.channel = {};
 		message.channel.name = "random";
 		
@@ -49,8 +50,24 @@ function TestMessages() {
 			console.log("MESSAGE reply " + s);
 		};
 		
+		message.id = new Date().getMilliseconds();
 		message.channel = {};
 		message.channel.name = "bot-admin";
+		
+		return message;
+	};
+
+	this.getNews = function() {	
+		var message = {};
+		message.content = "Really important message";
+		message.author = {};
+		message.author.username = "testingdude";
+		message.reply = function(s) {
+			console.log("MESSAGE reply " + s);
+		};
+		message.id = new Date().getMilliseconds();
+		message.channel = {};
+		message.channel.name = "news";
 		
 		return message;
 	};

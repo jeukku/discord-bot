@@ -48,6 +48,8 @@ function App(noptions) {
 	this.roles = require('./roles.js').init(this);
 	this.news = require('./news.js').init(this);
 
+	this.handlers = [this.news];
+	
 	this.checkRights = function(action, message) {
 		if(action.channel == "admin") {
 			console.log("checkrights " + message.author.username);
@@ -77,7 +79,7 @@ function App(noptions) {
 	}
 	
 	this.dbConnect = function(callback) {
-		//console.log("connecting to " + dburl);
+		// console.log("connecting to " + dburl);
 		var client = new MongoClient(dburl, { loggerLevel: "warn" });
 		client.connect((err, dbc) => {
 				const db = dbc.db('tzmfi_discord');
@@ -90,7 +92,8 @@ function App(noptions) {
 	}
 	
 	this.handleMessage = function(message, callback) {
-		// console.log("got message " + message.content + " on channel " + message.channel);
+		// console.log("got message " + message.content + " on channel " +
+		// message.channel);
 		var split = message.content.split(" ");
 		var first = split[0].trim();
 
@@ -192,6 +195,11 @@ function initApp() {
 		
 		var repl = "reaction added " + reaction.emoji.name + " id:" + reaction.emoji.identifier;
 		console.log("messageReactionAdd " + repl);
+		
+		for(var i in app.handlers) {
+			var h = app.handlers[i];
+			h.handle_reaction(reaction, user)
+		}
 		// reaction.message.reply(repl);
 	};
 	

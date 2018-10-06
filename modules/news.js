@@ -13,13 +13,17 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 'use strict';
 
 var news_arguments = {
-	setup: function() { console.log("news setup"); },
-	init: function(app) { return new news(app); }
+	setup : function() {
+		console.log("news setup");
+	},
+	init : function(app) {
+		return new news(app);
+	}
 };
 
 news_arguments.setup();
@@ -27,18 +31,46 @@ module.exports = news_arguments;
 
 function news(app) {
 	var self = this;
-	
+
 	this.handle = function(first, message) {
 	};
-	
+
+	this.handle_reaction = function(reaction, user) {
+		var message = reaction.message;
+		console.log("handle reaction to message " + message.content + "(" + message.id + ")");
+
+		app.dbConnect(function(err, dbclient, db) {
+			var cnews = db.collection('news');
+
+			var query = {
+				messageid : message.id
+			};
+			
+			var item = { messageid: message.id, text: message.content };
+			console.log("updating or adding " + JSON.stringify(item));
+			cnews.update( query, item, { upsert: true }, function(err, docs) {
+				if(err) {
+					console.log("ERROR " + err);
+				} else {
+					console.log("updated or added news " + docs);
+				}
+				
+				dbclient.close();
+			});
+		});
+	};
+
 	this.init = function(client) {
 		app.strings.get("CONFIG_GUILD_ID", "", function(err, value) {
-			if(!err) {
-				app.strings.get("CONFIG_NEWS_CHANNEL_ID", "", function(err, newschannel) {
-					if(!err) {
+			if (!err) {
+				app.strings.get("CONFIG_NEWS_CHANNEL_ID", "", function(err,
+						newschannel) {
+					if (!err) {
 						console.log("news channel id " + newschannel)
 						var guildx = client.guilds.find("id", value); // serverID
-						guildx.channels.find("id", newschannel).fetchMessages({limit: 50});
+						guildx.channels.find("id", newschannel).fetchMessages({
+							limit : 50
+						});
 					} else {
 						console.log("ERROR news channel id missing");
 					}
@@ -46,6 +78,6 @@ function news(app) {
 			} else {
 				console.log("ERROR " + err);
 			}
-		});		
+		});
 	}
 }
