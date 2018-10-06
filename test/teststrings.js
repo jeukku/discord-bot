@@ -19,18 +19,19 @@
 
 var stests_arguments = {
 		setup: function() { console.log("stests setup"); },
-		init: function() { return new StringTests(); }
+		init: function(app) { return new StringTests(app); }
 	};
 
 var messages = require("./messages.js").init();
+var app;
 
 stests_arguments.setup();
 module.exports = stests_arguments;
 
-function StringTests() {
+function StringTests(napp) {
+	app = napp;
+	
 	this.run = function() {
-		var app = require ("../modules/app.js").init();
-
 		var message = messages.getBotAdmin();
 		message.content = "!liststrings";
 		message.reply = function(s) {
@@ -45,5 +46,7 @@ function StringTests() {
 			console.log("getstring REPLY " + s);
 		};
 		app.message(message);
+		
+		app.shutdown();
 	}
 }

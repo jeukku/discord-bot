@@ -23,10 +23,10 @@ app.strings.set("UNKNOWN_RESPONSE", "unknown response", function() {
 	console.log("strings set callback");
 });
 
-var stringstests = require("./teststrings.js").init();
+var stringstests = require("./teststrings.js").init(app);
 stringstests.run();
 
-var stringstests = require("./testnews.js").init();
-stringstests.run();
+var newstests = require("./testnews.js").init(app);
+newstests.run();
 
 console.log("END");

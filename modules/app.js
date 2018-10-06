@@ -252,6 +252,12 @@ function initApp() {
 			res.send(html);
 		});
 	});
+	
+	exp.get("/news", function(req, res) {
+		var newscontent = app.news.get_content(function(newscontent) {
+			res.send(newscontent);
+		});
+	});
 
 	app.arguments.fetchArguments();
 
@@ -261,15 +267,14 @@ function initApp() {
 	
 	app.shutdown = function() {
 		console.log("app shutdown");
-		if(this.expserver) {
-			this.expserver.close();
-		}		
+		if(app.expserver) {
+			console.log("closing expserver");
+			app.expserver.close();
+		}
 	}
 	
-	if(app.options.listen_to_web) {
-		app.expserver = exp.listen(PORT);
-		console.log("Listening to port " + PORT);		
-	}
+	app.expserver = exp.listen(PORT);
+	console.log("Listening to port " + PORT);		
 	
 	return app;
 }

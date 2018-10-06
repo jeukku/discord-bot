@@ -46,7 +46,13 @@ function news(app) {
 				messageid : message.id
 			};
 			
-			var item = { messageid: message.id, text: message.content };
+			var item = { 
+					messageid: message.id, 
+					text: message.content, 
+					count: reaction.count,
+					nickname: message.member.nickname
+					};
+			
 			console.log("updating or adding " + JSON.stringify(item));
 			cnews.update( query, item, { upsert: true }, function(err, docs) {
 				if(err) {
@@ -79,5 +85,28 @@ function news(app) {
 				console.log("ERROR " + err);
 			}
 		});
-	}
+	};
+	
+	this.get_content = function(callback) {
+		app.dbConnect(function(err, dbclient, db) {
+			console.log("listing news");
+			var cnews = db.collection('news');
+			cnews.find({ count: { $gte: 2 } }).toArray(function(err, docs) {
+				console.log("news " + JSON.stringify(docs));
+				
+				var content = "";
+				
+				docs.forEach(function(item) {
+					if(content.length > 0) {
+						content += "\n";
+					}
+
+					content += item.text;
+				});
+
+				dbclient.close();
+				callback(content);
+			});
+		});
+	};
 }

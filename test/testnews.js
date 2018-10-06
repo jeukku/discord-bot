@@ -19,7 +19,7 @@
 
 var stests_arguments = {
 		setup: function() { console.log("stests setup"); },
-		init: function() { return new NewsTests(); }
+		init: function(app) { return new NewsTests(app); }
 	};
 
 var messages = require("./messages.js").init();
@@ -27,23 +27,31 @@ var messages = require("./messages.js").init();
 stests_arguments.setup();
 module.exports = stests_arguments;
 
-function NewsTests() {
-	this.run = function() {
-		var app = require ("../modules/app.js").init();
+var app;
 
-		var message = messages.getBotAdmin();
+function NewsTests(napp) {
+	app = napp;
+	
+	this.run = function() {
+		var message = messages.getNews();
 		message.content = "Important message";
 		message.reply = function(s) {
 			console.log("REPLY " + s);
 		};
 		
 		app.message(message);
+		
 		var reactinguser = {}
 		var reaction = {}
 		reaction.emoji = {}
 		reaction.emoji.name = ':thumbsup:'; 
 		reaction.message = message;
+		reaction.count = 1;
+		
 		app.reaction(reaction, reactinguser);
 		
+		var newscontent = app.news.get_content(function(newscontent) {
+			console.log("news content " + newscontent);			
+		});
 	}
 }
