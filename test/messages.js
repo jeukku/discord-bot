@@ -26,7 +26,7 @@ messages_arguments.setup();
 module.exports = messages_arguments;
 
 function TestMessages() {
-	this.get =function() {	
+	this.get = function() {	
 		var message = {};
 		message.content = "!JEE";
 		message.author = {};
@@ -34,7 +34,7 @@ function TestMessages() {
 		message.reply = function(s) {
 			console.log("MESSAGE reply " + s);
 		};
-		message.id = new Date().getMilliseconds();
+		message.id = Date.now();
 		message.channel = {};
 		message.channel.name = "random";
 		
@@ -50,7 +50,7 @@ function TestMessages() {
 			console.log("MESSAGE reply " + s);
 		};
 		
-		message.id = new Date().getMilliseconds();
+		message.id = Date.now();
 		message.channel = {};
 		message.channel.name = "bot-admin";
 		
@@ -66,7 +66,8 @@ function TestMessages() {
 			console.log("MESSAGE reply " + s);
 		};
 		message.createdAt = new Date();
-		message.id = new Date().getMilliseconds();
+		message.id = Date.now();
+		message.createdTimestamp = Date.now();
 		message.channel = {};
 		message.channel.name = "news";
 		message.member = { username: "testing2" };
