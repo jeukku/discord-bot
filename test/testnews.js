@@ -38,7 +38,7 @@ function NewsTests(napp) {
 		message.reply = function(s) {
 			console.log("REPLY " + s);
 		};
-		
+		message.channel = { id: app.news.news_channel_id };
 		app.message(message);
 		
 		var reactinguser = {}
@@ -46,7 +46,7 @@ function NewsTests(napp) {
 		reaction.emoji = {}
 		reaction.emoji.name = ':thumbsup:'; 
 		reaction.message = message;
-		reaction.count = 2 ;
+		reaction.count = 4;
 		
 		app.reaction(reaction, reactinguser);
 		
