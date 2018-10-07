@@ -147,8 +147,9 @@ function news(app) {
 
 		for (var i in updated_dates) {
 			var date = updated_dates[i];
-			fs.writeFileSync(app.options.news_items_path + date + '.md',
-					"START");
+			var template = "" + fs.readFileSync("files/news_template.md");
+			template = template.replace("REPLACE_TITLE", date);
+			fs.writeFileSync(app.options.news_items_path + date + '.md', template);
 		}
 
 		docs.forEach(function(item) {
