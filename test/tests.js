@@ -17,27 +17,16 @@
 
 'use strict';
 
-const Discord = require('discord.js');
-const client = new Discord.Client();
+var app = require ("../modules/app.js").init();
 
-var app = require('./modules/app.js').init();
-
-var podbot;
-
-client.on('ready', () => {
-	console.log('I am ready!');
-	//podbot = require('./podbot/index.js').create(ADMIN_CHANNEL_NAME, client);
+app.strings.set("UNKNOWN_RESPONSE", "unknown response", function() {
+	console.log("strings set callback");
 });
 
-client.on('message', app.message);
+var stringstests = require("./teststrings.js").init(app);
+stringstests.run();
 
-client.on('messageReactionAdd', app.reaction);
+var newstests = require("./testnews.js").init(app);
+newstests.run();
 
-client.on("debug", (e) => console.info(e));
-
-client.login(process.env.DISCORD_BOT_LOGIN).then(function() {
-	console.log("login success");	
-	app.init(client);
-}, function(err) {
-	console.log("login failed " + err);
-});
+console.log("END");

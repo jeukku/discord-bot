@@ -17,27 +17,36 @@
 
 'use strict';
 
-const Discord = require('discord.js');
-const client = new Discord.Client();
+var stests_arguments = {
+		setup: function() { console.log("stests setup"); },
+		init: function(app) { return new StringTests(app); }
+	};
 
-var app = require('./modules/app.js').init();
+var messages = require("./messages.js").init();
+var app;
 
-var podbot;
+stests_arguments.setup();
+module.exports = stests_arguments;
 
-client.on('ready', () => {
-	console.log('I am ready!');
-	//podbot = require('./podbot/index.js').create(ADMIN_CHANNEL_NAME, client);
-});
+function StringTests(napp) {
+	app = napp;
+	
+	this.run = function() {
+		var message = messages.getBotAdmin();
+		message.content = "!liststrings";
+		message.reply = function(s) {
+			console.log("REPLY " + s);
+		};
+		
+		app.message(message);
 
-client.on('message', app.message);
-
-client.on('messageReactionAdd', app.reaction);
-
-client.on("debug", (e) => console.info(e));
-
-client.login(process.env.DISCORD_BOT_LOGIN).then(function() {
-	console.log("login success");	
-	app.init(client);
-}, function(err) {
-	console.log("login failed " + err);
-});
+		message = messages.getBotAdmin();
+		message.content = "!getstring " + "UNKNOWN_RESPONSE";
+		message.reply = function(s) {
+			console.log("getstring REPLY " + s);
+		};
+		app.message(message);
+		
+		app.shutdown();
+	}
+}
