@@ -116,7 +116,7 @@ function news(app) {
 			var cnews = db.collection('news');
 			cnews.find({
 				count : {
-					$gte : 2
+					$gte : 3
 				}
 			}).toArray(
 					function(err, docs) {
