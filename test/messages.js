@@ -65,6 +65,7 @@ function TestMessages() {
 		message.reply = function(s) {
 			console.log("MESSAGE reply " + s);
 		};
+		message.createdAt = new Date();
 		message.id = new Date().getMilliseconds();
 		message.channel = {};
 		message.channel.name = "news";

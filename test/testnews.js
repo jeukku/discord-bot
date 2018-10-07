@@ -46,7 +46,7 @@ function NewsTests(napp) {
 		reaction.emoji = {}
 		reaction.emoji.name = ':thumbsup:'; 
 		reaction.message = message;
-		reaction.count = 1;
+		reaction.count = 2 ;
 		
 		app.reaction(reaction, reactinguser);
 		

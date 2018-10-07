@@ -38,7 +38,12 @@ function App(noptions) {
 	if(noptions) {
 		this.options = noptions;
 	} else {
-		this.options = {};
+		var optionsfile = process.env.DISCORD_BOT_OPTIONS;
+		if (!optionsfile) {
+			optionsfile = "options.json";
+		}
+		
+		this.options = JSON.parse(fs.readFileSync(optionsfile, 'utf8'));
 	}
 	
 	this.actions = {};

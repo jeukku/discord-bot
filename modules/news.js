@@ -17,6 +17,8 @@
 
 'use strict';
 
+const fs = require('fs');
+
 var news_arguments = {
 	setup : function() {
 		console.log("news setup");
@@ -37,7 +39,8 @@ function news(app) {
 
 	this.handle_reaction = function(reaction, user) {
 		var message = reaction.message;
-		console.log("handle reaction to message " + message.content + "(" + message.id + ")");
+		console.log("handle reaction (" + reaction.emoji.name + ") to message "
+				+ message.content + "(" + message.id + ")");
 
 		app.dbConnect(function(err, dbclient, db) {
 			var cnews = db.collection('news');
@@ -45,22 +48,29 @@ function news(app) {
 			var query = {
 				messageid : message.id
 			};
-			
-			var item = { 
-					messageid: message.id, 
-					text: message.content, 
-					count: reaction.count,
-					nickname: message.member.nickname
-					};
-			
+
+			var cat = message.createdAt;
+			var createdAt = cat.getUTCFullYear() + "-" + cat.getUTCMonth()
+					+ "-" + cat.getUTCDate();
+
+			var item = {
+				messageid : message.id,
+				text : message.content,
+				count : reaction.count,
+				nickname : message.member.nickname,
+				createdAt : createdAt
+			};
+
 			console.log("updating or adding " + JSON.stringify(item));
-			cnews.update( query, item, { upsert: true }, function(err, docs) {
-				if(err) {
+			cnews.update(query, item, {
+				upsert : true
+			}, function(err, docs) {
+				if (err) {
 					console.log("ERROR " + err);
 				} else {
 					console.log("updated or added news " + docs);
 				}
-				
+
 				dbclient.close();
 			});
 		});
@@ -86,22 +96,45 @@ function news(app) {
 			}
 		});
 	};
-	
+
+	// every news item that isn't published and where reaction count is greater that 1
+	// is written to a date.md file
 	this.get_content = function(callback) {
 		app.dbConnect(function(err, dbclient, db) {
 			console.log("listing news");
 			var cnews = db.collection('news');
-			cnews.find({ count: { $gte: 2 } }).toArray(function(err, docs) {
+			cnews.find({
+				count : {
+					$gte : 2
+				}
+			}).toArray(function(err, docs) {
 				console.log("news " + JSON.stringify(docs));
-				
-				var content = "";
-				
-				docs.forEach(function(item) {
-					if(content.length > 0) {
-						content += "\n";
-					}
 
-					content += item.text;
+				var content = "";
+
+				docs.forEach(function(item) {
+					if (!item.published) {
+						var icontent = "";
+						icontent += item.nickname;
+						icontent += ": ";
+						icontent += item.text;
+
+						icontent += "\n";
+						content += icontent;
+						
+						fs.appendFileSync(app.options.news_items_path + item.createdAt + '.md', icontent);
+						
+						var query = {
+							messageid : item.messageid
+						};
+						item.published = true
+
+						cnews.update(query, item, {
+							upsert : true
+						}, function(err, docs) {
+							console.log("updated " + docs);
+						});
+					}
 				});
 
 				dbclient.close();
