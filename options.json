@@ -1,3 +1,4 @@
 {
-	"news_items_path": "../tmp/"
+	"news_items_path": "../tmp/",
+	"news_json_path": "../tmp/"
 }
