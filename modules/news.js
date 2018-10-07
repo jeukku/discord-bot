@@ -38,7 +38,17 @@ function news(app) {
 	};
 
 	this.handle_reaction = function(reaction, user) {
-		var message = reaction.message;
+		var message = reaction.message;		
+		app.strings.get("CONFIG_NEWS_CHANNEL_ID", "",
+				function(err, newschannel) {
+					if (message.channel.id == newschannel) {
+						app.news.handle_news_reaction(reaction, message, user);
+					}
+				});
+	};
+
+	this.handle_news_reaction = function(reaction, message, user)
+	{
 		console.log("handle reaction (" + reaction.emoji.name + ") to message "
 				+ message.content + "(" + message.id + ")");
 
@@ -97,7 +107,8 @@ function news(app) {
 		});
 	};
 
-	// every news item that isn't published and where reaction count is greater that 1
+	// every news item that isn't published and where reaction count is greater
+	// that 1
 	// is written to a date.md file
 	this.get_content = function(callback) {
 		app.dbConnect(function(err, dbclient, db) {
@@ -107,41 +118,45 @@ function news(app) {
 				count : {
 					$gte : 2
 				}
-			}).toArray(function(err, docs) {
-				console.log("news " + JSON.stringify(docs));
+			}).toArray(
+					function(err, docs) {
+						console.log("news " + JSON.stringify(docs));
 
-				var content = "";
+						var content = "";
 
-				fs.writeFileSync(app.options.news_json_path + 'messages.json', JSON.stringify(docs, null, 2));
+						fs.writeFileSync(app.options.news_json_path
+								+ 'messages.json', JSON
+								.stringify(docs, null, 2));
 
-				docs.forEach(function(item) {
-					if (!item.published) {
-						var icontent = "";
-						icontent += item.username;
-						icontent += ": ";
-						icontent += item.text;
+						docs.forEach(function(item) {
+							if (!item.published) {
+								var icontent = "";
+								icontent += item.username;
+								icontent += ": ";
+								icontent += item.text;
 
-						icontent += "\n";
-						content += icontent;
-						
-						fs.appendFileSync(app.options.news_items_path + item.createdAt + '.md', icontent);
-						
-						var query = {
-							messageid : item.messageid
-						};
-						item.published = true
+								icontent += "\n";
+								content += icontent;
 
-						cnews.update(query, item, {
-							upsert : true
-						}, function(err, docs) {
-							console.log("updated " + docs);
+								fs.appendFileSync(app.options.news_items_path
+										+ item.createdAt + '.md', icontent);
+
+								var query = {
+									messageid : item.messageid
+								};
+								item.published = true
+
+								cnews.update(query, item, {
+									upsert : true
+								}, function(err, docs) {
+									console.log("updated " + docs);
+								});
+							}
 						});
-					}
-				});
 
-				dbclient.close();
-				callback(content);
-			});
+						dbclient.close();
+						callback(content);
+					});
 		});
 	};
 }
