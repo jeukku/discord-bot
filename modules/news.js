@@ -57,7 +57,7 @@ function news(app) {
 				messageid : message.id,
 				text : message.content,
 				count : reaction.count,
-				nickname : message.member.nickname,
+				username : message.author.username,
 				createdAt : createdAt
 			};
 
@@ -112,10 +112,12 @@ function news(app) {
 
 				var content = "";
 
+				fs.writeFileSync(app.options.news_json_path + 'messages.json', JSON.stringify(docs, null, 2));
+
 				docs.forEach(function(item) {
 					if (!item.published) {
 						var icontent = "";
-						icontent += item.nickname;
+						icontent += item.username;
 						icontent += ": ";
 						icontent += item.text;
 

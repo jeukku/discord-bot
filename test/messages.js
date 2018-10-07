@@ -69,7 +69,7 @@ function TestMessages() {
 		message.id = new Date().getMilliseconds();
 		message.channel = {};
 		message.channel.name = "news";
-		message.member = { nickname: "testing2" };
+		message.member = { username: "testing2" };
 		console.log("created a news message with id " + message.id);
 		return message;
 	};
