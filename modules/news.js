@@ -47,7 +47,7 @@ function news(app) {
 
 	this.handle_news_reaction = function(reaction, message, user) {
 		console.log("handle reaction (" + reaction.emoji.name + ") to message "
-				+ message.content + "(" + message.id + ")");
+				+ message.cleaned_content + "(" + message.id + ")");
 
 		app.dbConnect(function(err, dbclient, db) {
 			var cnews = db.collection('news');
@@ -62,7 +62,7 @@ function news(app) {
 
 			var item = {
 				messageid : message.id,
-				text : message.content,
+				text : message.cleaned_content,
 				count : reaction.count,
 				username : message.author.username,
 				createdAt : createdAt,
