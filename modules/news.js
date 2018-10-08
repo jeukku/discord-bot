@@ -149,7 +149,7 @@ function news(app) {
 			var date = updated_dates[i];
 			var template = "" + fs.readFileSync("files/news_template.md");
 			template = template.replace("REPLACE_TITLE", date);
-			fs.writeFileSync(app.options.news_items_path + date + '.md', template);
+			fs.writeFileSync(app.options.news_items_path + date + '-news.md', template);
 		}
 
 		docs.forEach(function(item) {
