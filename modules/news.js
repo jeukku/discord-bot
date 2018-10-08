@@ -66,7 +66,8 @@ function news(app) {
 				count : reaction.count,
 				username : message.author.username,
 				createdAt : createdAt,
-				timestamp : message.createdTimestamp
+				timestamp : message.createdTimestamp,
+				published: false
 			};
 
 			console.log("updating or adding " + JSON.stringify(item));
@@ -159,12 +160,12 @@ function news(app) {
 			if (updated_dates.includes(createdAt)) {
 				console.log("writing item to md " + item.timestamp + " createdAt:" + createdAt);
 
-				var icontent = "";
+				var icontent = "### ";
 				icontent += item.username;
-				icontent += ": ";
+				icontent += "\n\n";				
 				icontent += item.text;
 
-				icontent += "\n";
+				icontent += "\n\n";
 				content += icontent;
 
 				var appendfile = app.options.news_items_path + createdAt + "-news.md";

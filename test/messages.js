@@ -60,6 +60,7 @@ function TestMessages() {
 	this.getNews = function() {	
 		var message = {};
 		message.content = "Really important message";
+		message.cleaned_content = message.content;
 		message.author = {};
 		message.author.username = "testingdude";
 		message.reply = function(s) {
