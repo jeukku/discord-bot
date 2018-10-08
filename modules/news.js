@@ -164,8 +164,8 @@ function news(app) {
 				icontent += "\n";
 				content += icontent;
 
-				fs.appendFileSync(app.options.news_items_path + item.createdAt
-						+ '.md', icontent);
+				fs.appendFileSync(app.options.news_items_path + item.createdAt + 
+						+ '-news.md', icontent);
 
 				var query = {
 					messageid : item.messageid
