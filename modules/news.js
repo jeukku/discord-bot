@@ -149,12 +149,15 @@ function news(app) {
 			var date = updated_dates[i];
 			var template = "" + fs.readFileSync("files/news_template.md");
 			template = template.replace("REPLACE_TITLE", date);
-			fs.writeFileSync(app.options.news_items_path + date + '-news.md', template);
+			var createfile = app.options.news_items_path + date + '-news.md';
+			console.log("creating file " + createfile);
+			fs.writeFileSync(createfile, template);
 		}
 
 		docs.forEach(function(item) {
-			if (updated_dates.includes(item.createdAt)) {
-				console.log("writing item to md " + item.timestamp);
+			var createdAt = "" + item.createdAt;
+			if (updated_dates.includes(createdAt)) {
+				console.log("writing item to md " + item.timestamp + " createdAt:" + createdAt);
 
 				var icontent = "";
 				icontent += item.username;
@@ -164,8 +167,9 @@ function news(app) {
 				icontent += "\n";
 				content += icontent;
 
-				fs.appendFileSync(app.options.news_items_path + item.createdAt + 
-						+ '-news.md', icontent);
+				var appendfile = app.options.news_items_path + createdAt + "-news.md";
+				console.log("appending in file " + appendfile);
+				fs.appendFileSync(appendfile, icontent);
 
 				var query = {
 					messageid : item.messageid
