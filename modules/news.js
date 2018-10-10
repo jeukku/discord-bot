@@ -57,7 +57,7 @@ function news(app) {
 			};
 
 			var cat = message.createdAt;
-			var createdAt = cat.getUTCFullYear() + "-" + cat.getUTCMonth()
+			var createdAt = cat.getUTCFullYear() + "-" + (cat.getUTCMonth() + 1)
 					+ "-" + cat.getUTCDate();
 
 			var item = {
