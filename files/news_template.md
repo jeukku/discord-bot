@@ -2,7 +2,7 @@
 layout: post
 
 # post title
-title: REPLACE_TITLE
+title: Date REPLACE_TITLE
 
 # post author
 author: tzm-bot
