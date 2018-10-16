@@ -147,9 +147,9 @@ function news(app) {
 		var filepath;
 		
 		if(date!=topic) {
-			filepath = app.options.news_items_path + "news-" + date + "-" + topic + '.md';
+			filepath = app.options.news_items_path + date + "-" + topic + '.md';
 		} else {
-			filepath = app.options.news_items_path + "news-" + date + '.md';			
+			filepath = app.options.news_items_path + date + '-news.md';			
 		}
 		
 		filepath = filepath.replace(/ /g, "_");
