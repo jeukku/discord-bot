@@ -59,8 +59,8 @@ function TestMessages() {
 
 	this.getNews = function() {	
 		var message = {};
-		message.content = "Really important message";
-		message.cleaned_content = message.content;
+		message.content = "topic: THIS IS TOPIC\nReally important message";
+		message.cleanContent = message.content;
 		message.author = {};
 		message.author.username = "testingdude";
 		message.reply = function(s) {

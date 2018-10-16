@@ -59,13 +59,28 @@ function news(app) {
 			var cat = message.createdAt;
 			var createdAt = cat.getUTCFullYear() + "-" + (cat.getUTCMonth() + 1)
 					+ "-" + cat.getUTCDate();
-
+			var topic = "" + createdAt;
+			var orgtext = message.cleanContent;
+			
+			var textlines = orgtext.split("\n")
+			var text = "";
+			for (var iline in textlines) {
+				var line = textlines[iline];
+				console.log("checking line " + line);
+				if (line.startsWith("topic:")) {
+					topic = line.substr(line.indexOf(":")+1).trim()
+				} else {
+					text += line + "\n";
+				}
+			}
+			
 			var item = {
 				messageid : message.id,
-				text : message.cleanContent,
+				text : text,
 				count : reaction.count,
 				username : message.author.username,
 				createdAt : createdAt,
+				topic: topic,
 				timestamp : message.createdTimestamp,
 				published: false
 			};
@@ -127,6 +142,19 @@ function news(app) {
 		});
 	};
 
+	this.get_topic_file = function(date, topic) {
+		var filepath;
+		
+		if(date!=topic) {
+			filepath = app.options.news_items_path + "news-" + date + "-" + topic + '.md';
+		} else {
+			filepath = app.options.news_items_path + "news-" + date + '.md';			
+		}
+		
+		filepath = filepath.replace(/ /g, "_");
+		return filepath;
+	};
+	
 	this.get_content_docs = function(dbclient, cnews, err, docs, callback) {
 		console.log("news count:" + docs.length + " " + JSON.stringify(docs));
 
@@ -135,40 +163,47 @@ function news(app) {
 		fs.writeFileSync(app.options.news_json_path + 'messages.json', JSON
 				.stringify(docs, null, 2));
 
-		var updated_dates = [];
+		var updated_topics = {};
 
 		docs.forEach(function(item) {
-			if (!item.published && !(updated_dates.includes(item.createdAt))) {
-				console.log("something updated");
-				updated_dates.push(item.createdAt);
+			if (!item.published && !(Object.keys(updated_topics).includes(item.topic))) {
+				console.log("something updated topic:" + item.topic + " createdAt:" + item.createdAt);
+				updated_topics[item.topic] = item.createdAt;
 			}
 		});
 
-		console.log("updated_dates " + updated_dates);
+		console.log("updated_topics " + updated_topics);
 
-		for (var i in updated_dates) {
-			var date = updated_dates[i];
+		for (var topic in updated_topics) {
+			var date = updated_topics[topic];
 			var template = "" + fs.readFileSync("files/news_template.md");
-			template = template.replace("REPLACE_TITLE", date);
-			var createfile = app.options.news_items_path + date + '-news.md';
+			template = template.replace("REPLACE_TITLE", topic);
+			var createfile = app.news.get_topic_file(date, topic);
 			console.log("creating file " + createfile);
 			fs.writeFileSync(createfile, template);
 		}
 
 		docs.forEach(function(item) {
 			var createdAt = "" + item.createdAt;
-			if (updated_dates.includes(createdAt)) {
-				console.log("writing item to md " + item.timestamp + " createdAt:" + createdAt);
+			var topic = "" + item.topic;
+			if (Object.keys(updated_topics).includes(topic)) {
+				console.log("writing item to md " + item.timestamp + " createdAt:" + createdAt + " topic:" + topic);
 
 				var icontent = "### ";
-				icontent += item.username;
+				if(topic!=createdAt) {
+					icontent += topic;
+					icontent += "\n#### " + item.username;
+				} else {
+					icontent += item.username;					
+				}
+				
 				icontent += "\n\n";				
 				icontent += item.text;
 
 				icontent += "\n\n";
 				content += icontent;
 
-				var appendfile = app.options.news_items_path + createdAt + "-news.md";
+				var appendfile = app.news.get_topic_file(createdAt, topic);
 				console.log("appending in file " + appendfile);
 				fs.appendFileSync(appendfile, icontent);
 
