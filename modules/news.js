@@ -49,6 +49,7 @@ function news(app) {
 		console.log("handle reaction (" + reaction.emoji.name + ") to message "
 				+ message.cleanContent + "(" + message.id + ")");
 
+		if(reaction.emoji.name == '👍')
 		app.dbConnect(function(err, dbclient, db) {
 			var cnews = db.collection('news');
 
