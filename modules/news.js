@@ -199,7 +199,7 @@ function news(app) {
 				}
 				
 				icontent += "\n\n";				
-				icontent += item.text;
+				icontent += item.text.replace(/\n/g, "  \n");
 
 				icontent += "\n\n";
 				content += icontent;
